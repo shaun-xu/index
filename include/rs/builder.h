@@ -26,6 +26,7 @@ class Builder {
         prev_position_(0),
         prev_prefix_(0) {
     // Initialize radix table, needs to contain all prefixes up to the largest
+
     // key + 1.
     const uint32_t max_prefix = (max_key - min_key) >> num_shift_bits_;
     radix_table_.resize(max_prefix + 2, 0);

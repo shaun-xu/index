@@ -11,7 +11,7 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 file(GLOB INCLUDE_H "include/ts/*.h")
 file(GLOB INCLUDE_H "include/rs/*.h")
 set(EXAMPLE_FILES example.cc)
-set(BENCH_END_TO_END_FILES bench_end_to_end.cc)
+set(BENCH_END_TO_END_FILES bench_end_to_end.cc include/rmi/models/model.h include/rmi/models/linear.h include/rmi/traindata.h include/rmi/models/robust_linear.h include/rmi/models/log_linear.h include/rmi/models/utils.h)
 
 add_executable(example ${INCLUDE_H} ${EXAMPLE_FILES})
 add_executable(bench_end_to_end ${INCLUDE_H} ${BENCH_END_TO_END_FILES})

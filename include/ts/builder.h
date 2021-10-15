@@ -236,7 +236,7 @@ class Builder {
 
   void ComputeRadixTableStatistics(std::vector<Statistics>& statistics) {
     static constexpr unsigned maxNumRadixBits = 30;
-    
+
     // Init the radix analyzer.
     std::vector<RadixConfig> radixAnalyzer;
     radixAnalyzer.resize(1 + maxNumRadixBits);
@@ -244,7 +244,7 @@ class Builder {
       radixAnalyzer[index].shiftBits = GetNumShiftBits(max_key_ - min_key_, index);
       radixAnalyzer[index].prevPrefix = 0;
       radixAnalyzer[index].prevSplineIndex = 0;
-      radixAnalyzer[index].cost = 0;       
+      radixAnalyzer[index].cost = 0;
     }
     
     // And compute the costs.
