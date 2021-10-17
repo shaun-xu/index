@@ -4,10 +4,51 @@
 
 #ifndef TS_UTILS_H
 #define TS_UTILS_H
+#include <assert.h>
 #include <stdio.h>
+#include "../../thirdpart/libdivide/libdivide.h"
+
 #include <vector>
 
 namespace rmi{
+
+int32_t   NumBits(uint64_t  larget_value){
+  int32_t nbits = 0;
+  while (1 << (nbits+1)) - 1 <= larget_value {
+        nbits += 1;
+    }
+  nbits -= 1;
+  assert((1 << (nbits+1)) - 1 <= larget_value);
+  return nbits;
+}
+
+int32_t CommonPrefixSize( const std::vector<uint32_t> &keys){
+  uint32_t  any_ones = 0;
+  uint32_t    no_ones = 0;
+  for( uint64_t x : keys){
+    any_ones |= x;
+    no_ones &= x;
+  }
+
+  uint32_t   any_zeros = !no_ones;
+  uint32_t     prefix_bits = any_zeros ^ any_ones;
+  return libdivide::libdivide_count_leading_zeros32(prefix_bits);
+}
+
+
+int32_t CommonPrefixSize( const std::vector<uint64_t> &keys){
+  uint64_t   any_ones = 0;
+  uint64_t    no_ones = 0;
+  for( uint64_t x : keys){
+    any_ones |= x;
+    no_ones &= x;
+  }
+
+  uint64_t   any_zeros = !no_ones;
+  uint64_t     prefix_bits = any_zeros ^ any_ones;
+
+  return libdivide::libdivide_count_leading_zeros64(prefix_bits);
+}
 
 std::pair<double,double>    Slr(const std::vector<uint64_t>& keys,
                                        const std::vector<double>& values){
@@ -16,7 +57,7 @@ std::pair<double,double>    Slr(const std::vector<uint64_t>& keys,
   double c = 0.0;
   double n = 0;
   double m2 = 0.0;
-  static_assert(keys.size() == values.size(), "data size must be same");
+  assert(  (keys.size() == values.size()));
 
   u_int64_t data_size = keys.size();
   for (size_t i = 0; i < data_size; i++) {
@@ -39,12 +80,12 @@ std::pair<double,double>    Slr(const std::vector<uint64_t>& keys,
   }
 
   if (data_size == 1) {
-    return new LinearModel(0.0, mean_y);
+    return std::pair<double,double>(0.0, mean_y);
   }
 
   double cov = c / double(n - 1);
   double var = m2 / double(n - 1);
-  assert !(var >= 0.0);
+  assert(var >= 0.0);
 
   if (var == 0.0) {
     // variance is zero. pick the mean (only) value.

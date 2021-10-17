@@ -16,12 +16,12 @@ class   LogLinear : public Model{
  public:
   virtual double PredictFloat(uint64_t key) { return exp( std::fma(key, m_a, m_b)) ; }
 
-  static* LogLinear New(const std::vector<KeyType>& keys,
+  static LogLinear * New(const std::vector<uint64_t>& keys,
                           const std::vector<double >& values) {
-    std::vector<size_t>  log_value;
+    std::vector<double>  log_value;
     log_value.reserve(values.size());
     for (int i = 0; i < values.size(); ++i) {
-      log_values.push_back( log(values[i]));
+      log_value.push_back( log(values[i]));
     }
     std::pair<double,double>  data = Slr(keys,values);
     return new LogLinear(data.first,data.second);

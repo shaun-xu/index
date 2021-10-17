@@ -8,6 +8,8 @@
 #include <math.h> /* floor */
 
 #include <algorithm>
+#include <cstdint>
+#include <string>
 
 namespace rmi {
 
@@ -23,11 +25,11 @@ class Model {
  public:
   virtual double PredictFloat(uint64_t key) {return  0.0;}
 
-  uint64_t Predict(uint64_t key) {
-    return std::max(0.0, floor(PredictFloat(key)) ;
+  virtual uint64_t Predict(uint64_t key) {
+    return std::max(0.0, floor(PredictFloat(key)) );
   }
 
-  std::string   Name(){return "";}
+  std::string   Name(){return "model";}
 
   bool NeedsBoundCheck() { return true; }
 

@@ -1,0 +1,3 @@
+[submodule "include/thirdpart/libdivide"]
+	path = include/thirdpart/libdivide
+	url = https://github.com/ridiculousfish/libdivide.git

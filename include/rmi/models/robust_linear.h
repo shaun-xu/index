@@ -18,7 +18,7 @@ class   RobustLinear{
 
   virtual double PredictFloat(uint64_t key) { return std::fma(key, m_a, m_b); }
 
-  RobustLinear * New(const std::vector<KeyType>& keys,const std::vector<size_t>& values){
+  RobustLinear * New(const std::vector<uint64_t>& keys,const std::vector<double>& values){
 
       return NULL;
   }
@@ -26,7 +26,8 @@ class   RobustLinear{
   std::string Name() { return "robust_linear"; }
 
  private:
-
+  double  m_a;
+  double  m_b;
 };
 
 

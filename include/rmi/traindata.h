@@ -10,7 +10,7 @@ namespace rmi{
 template <class KeyType>
 class   TrainData{
  public:
-  TrainData()
+  TrainData();
 };
 
 
