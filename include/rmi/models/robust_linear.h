@@ -16,18 +16,25 @@ namespace   rmi{
 class   RobustLinear{
  public:
 
-  virtual double PredictFloat(uint64_t key) { return std::fma(key, m_a, m_b); }
+  virtual double PredictFloat(uint64_t key) { return std::fma(key, m_nA, m_nB); }
 
   RobustLinear * New(const std::vector<uint64_t>& keys,const std::vector<double>& values){
-
-      return NULL;
+    assert(keys.size() == values.size());
+    uint32_t   bnd = std::max(double(1),  keys.size() * 0.0001);
+    std::pair<double,double>  result = SlrSkip(keys,values, bnd);
+    return new RobustLinear(result.first,result.second);
   }
 
   std::string Name() { return "robust_linear"; }
 
  private:
-  double  m_a;
-  double  m_b;
+  RobustLinear(double a, double  b){
+    m_nA = a;
+    m_nB = b;
+  }
+
+  double  m_nA;
+  double  m_nB;
 };
 
 

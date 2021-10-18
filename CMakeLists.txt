@@ -21,7 +21,7 @@ set(BENCH_END_TO_END_FILES bench_end_to_end.cc include/rmi/models/model.h
         include/thirdpart/libdivide/u16_ldparams.h  include/thirdpart/libdivide/constant_fast_div.h
         include/rmi/models/radix_table.h include/rmi/models/linear_spline.h
         include/rmi/models/balanced_radix.h include/rmi/models/cubic_spline.h include/rmi/models/normal.h
-        include/rmi/models/log_normal.h include/rmi/rmi_models.h include/rmi/builder.h)
+        include/rmi/models/log_normal.h include/rmi/rmi_models.h include/rmi/builder.h include/rmi/model_creator.h)
 
 add_executable(example ${INCLUDE_H} ${EXAMPLE_FILES})
 add_executable(bench_end_to_end ${INCLUDE_H} ${BENCH_END_TO_END_FILES})
