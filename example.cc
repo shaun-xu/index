@@ -4,6 +4,16 @@
 
 #include "include/ts/builder.h"
 #include "include/ts/common.h"
+#include "include/rmi/models/balanced_radix.h"
+#include "include/rmi/models/cubic_spline.h"
+#include "include/rmi/models/linear.h"
+#include "include/rmi/models/linear_spline.h"
+#include "include/rmi/models/log_normal.h"
+#include "include/rmi/models/model.h"
+#include "include/rmi/models/normal.h"
+#include "include/rmi/models/radix.h"
+#include "include/rmi/models/radix_table.h"
+#include "include/rmi/models/robust_linear.h"
 
 using namespace std;
 
@@ -34,6 +44,7 @@ void TrieSplineExample() {
 }
 
 int main(int argc, char** argv) {
-  TrieSplineExample();
+//  TrieSplineExample();
+  rmi::BalancedRadix::Test();
   return 0;
 }

@@ -14,7 +14,7 @@ namespace rmi{
 
 int32_t   NumBits(uint64_t  larget_value){
   int32_t nbits = 0;
-  while (1 << (nbits+1)) - 1 <= larget_value {
+  while( (1 << (nbits+1)) - 1 <= larget_value ){
         nbits += 1;
     }
   nbits -= 1;
@@ -48,6 +48,21 @@ int32_t CommonPrefixSize( const std::vector<uint64_t> &keys){
   uint64_t     prefix_bits = any_zeros ^ any_ones;
 
   return libdivide::libdivide_count_leading_zeros64(prefix_bits);
+}
+
+double  Scale(double value, double  min , double  max){
+  return  (value-min)/(max-min);
+}
+
+double   Exp1(double  x){
+  x = 1.0 + x / 64.0;
+  x *= x;
+  x *= x;
+  x *= x;
+  x *= x;
+  x *= x;
+  x *= x;
+  return x;
 }
 
 std::pair<double,double>    Slr(const std::vector<uint64_t>& keys,

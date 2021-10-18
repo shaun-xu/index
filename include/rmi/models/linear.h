@@ -24,6 +24,9 @@ class LinearModel : public Model{
   }
 
   std::string Name() { return "linear"; }
+  double m_a;
+  double m_b;
+
 
  private:
   LinearModel(double a, double b) {
@@ -31,8 +34,6 @@ class LinearModel : public Model{
     m_b = b;
   }
 
-  double m_a;
-  double m_b;
 };
 
 }  // namespace rmi

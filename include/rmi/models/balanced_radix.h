@@ -26,6 +26,28 @@ class   BalancedRadix : public Model{
     return   input-m_nMax;
   }
 
+  static  bool  Test(){
+    std::vector<uint64_t>   keys(65000);
+    std::vector<uint64_t>   values(65000);
+
+    for (int i = 0; i <values.size() ; ++i) {
+        keys[i]=i;
+        values[i]=i;
+    }
+    BalancedRadix  * model = New(keys,values);
+    uint64_t delta=0;
+    int max = 0;
+    for (int i = 0; i <values.size() ; ++i) {
+      uint64_t   pos = model->Predict(keys[i]);
+      int current= abs(int (pos-values[i]) );
+      if(current > max){
+        max = current;
+      }
+      delta += current;
+    }
+    delete  model;
+  }
+
   template <class KeyType>
   static  BalancedRadix * New(const std::vector<KeyType>& keys,
                               const std::vector<uint64_t >& values){
