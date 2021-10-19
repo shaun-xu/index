@@ -17,7 +17,8 @@ class LinearModel : public Model{
  public:
   virtual double PredictFloat(uint64_t key) { return std::fma(key, m_a, m_b); }
 
-  static LinearModel*  New(const std::vector<uint64_t>& keys,
+  template <class KeyType>
+  static LinearModel*  New(const std::vector<KeyType>& keys,
                           const std::vector<double >& values) {
     std::pair<double,double>  data = Slr(keys,values);
     return new LinearModel(data.first,data.second);

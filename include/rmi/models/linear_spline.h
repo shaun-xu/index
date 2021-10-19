@@ -23,7 +23,7 @@ class   LinearSpline : public Model{
 
   template <class  KeyType>
   static   LinearSpline * New(const std::vector<KeyType>& keys,
-                              const std::vector<uint64_t >& values){
+                              const std::vector<double >& values){
     assert(keys.size() == values.size());
     double  slope =  double(values[values.size()-1]-values[0])/\
                    (double )(keys[keys.size()-1]-keys[0]);

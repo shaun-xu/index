@@ -21,7 +21,8 @@ class     LogNormal: public Normal{
     return Phi((double(log(key)) - m_nMean) / m_nStDev) * m_nScale;
   }
 
-  static   LogNormal * New(const std::vector<uint64_t>& keys,
+  template <class  KeyType>
+  static   LogNormal * New(const std::vector<KeyType>& keys,
                              const std::vector<double >& values){
       assert(keys.size() == values.size());
       double   mean=0.0;

@@ -34,7 +34,8 @@ class   CubicSpline : public  Model{
     return tmp;
   }
 
-  static  CubicSpline * New(const std::vector<uint64_t>& keys,
+  template <class KeyType>
+  static  CubicSpline * New(const std::vector<KeyType>& keys,
                           const std::vector<double >& values){
     assert(keys.size() == values.size());
     //cubic模型包含了线性模型，比较两者最优的

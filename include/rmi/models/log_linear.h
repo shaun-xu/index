@@ -16,7 +16,8 @@ class   LogLinear : public Model{
  public:
   virtual double PredictFloat(uint64_t key) { return exp( std::fma(key, m_a, m_b)) ; }
 
-  static LogLinear * New(const std::vector<uint64_t>& keys,
+  template <class  KeyType>
+  static LogLinear * New(const std::vector<KeyType>& keys,
                           const std::vector<double >& values) {
     std::vector<double>  log_value;
     log_value.reserve(values.size());

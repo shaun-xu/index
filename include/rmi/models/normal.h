@@ -28,7 +28,8 @@ class   Normal : public  Model{
 
   std::string  Name(){  return "normal";}
 
-  static   Normal *  New(const std::vector<uint64_t>& keys,
+  template <class  KeyType>
+  static   Normal *  New(const std::vector<KeyType>& keys,
                          const std::vector<double >& values){
 
     assert(keys.size() == values.size());

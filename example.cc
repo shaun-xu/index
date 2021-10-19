@@ -15,6 +15,8 @@
 #include "include/rmi/models/radix_table.h"
 #include "include/rmi/models/robust_linear.h"
 
+#include "include/rmi/rmi_models.h"
+
 using namespace std;
 
 void TrieSplineExample() {
@@ -45,6 +47,17 @@ void TrieSplineExample() {
 
 int main(int argc, char** argv) {
 //  TrieSplineExample();
-  rmi::BalancedRadix::Test();
+//  rmi::BalancedRadix::Test();
+std::vector<uint64_t>   keys(65000);
+std::vector<double>   values(65000);
+
+for (int i = 0; i <values.size() ; ++i) {
+  keys[i]=i;
+  values[i]=i;
+}
+
+  rmi::RMIModels<uint64_t> *model = rmi::RMIModels<uint64_t >::New("linear","linear",keys,values,1024);
+
+
   return 0;
 }

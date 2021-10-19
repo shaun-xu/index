@@ -121,7 +121,7 @@ std::pair<double,double>    Slr(const std::vector<uint64_t>& keys,
   double m2 = 0.0;
   assert(  (keys.size() == values.size()));
 
-  u_int64_t data_size = keys.size();
+  size_t data_size = keys.size();
   for (size_t i = 0; i < data_size; i++) {
     double x = keys[i];
     double y = values[i];
@@ -133,7 +133,6 @@ std::pair<double,double>    Slr(const std::vector<uint64_t>& keys,
 
     double dx2 = x - mean_x;
     m2 += dx * dx2;
-    data_size += 1;
   }
 
   // special case when we have 0 or 1 items

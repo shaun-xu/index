@@ -28,13 +28,13 @@ class   BalancedRadix : public Model{
 
   static  bool  Test(){
     std::vector<uint64_t>   keys(65000);
-    std::vector<uint64_t>   values(65000);
+    std::vector<double>   values(65000);
 
     for (int i = 0; i <values.size() ; ++i) {
         keys[i]=i;
         values[i]=i;
     }
-    BalancedRadix  * model = New(keys,values);
+    BalancedRadix  * model = BalancedRadix::New<uint64_t>(keys,values);
     uint64_t delta=0;
     int max = 0;
     for (int i = 0; i <values.size() ; ++i) {
@@ -50,7 +50,7 @@ class   BalancedRadix : public Model{
 
   template <class KeyType>
   static  BalancedRadix * New(const std::vector<KeyType>& keys,
-                              const std::vector<uint64_t >& values){
+                              const std::vector<double >& values){
 
     uint64_t   larget = values[values.size()-1];
     uint32_t   bits = NumBits(larget);
@@ -61,13 +61,13 @@ class   BalancedRadix : public Model{
     for (int i = bits; i < range; ++i) {
       uint64_t  bit_max = (   1<<(i+1)) -1;
       BalancedRadix  high( common_prefix, i, larget-1, true );
-      double high_score=high.CalScore(keys,values, larget);
+      double high_score=high.CalScore<KeyType>(keys,values, larget);
       if(high_score<best_score){
         best_score = high_score;
         best_model = high;
       }
       BalancedRadix  low(common_prefix,  i, larget-bit_max, false);
-      double  low_score = low.CalScore(keys,values, larget);
+      double  low_score = low.CalScore<KeyType>(keys,values, larget);
       if(low_score < best_score){
         best_score = low_score;
         best_model = low;
@@ -78,7 +78,7 @@ class   BalancedRadix : public Model{
 
   template <class KeyType>
   double   CalScore(const std::vector<KeyType>& keys,
-                      const std::vector<uint64_t >& values, uint32_t max_bin){
+                      const std::vector<double >& values, uint32_t max_bin){
     std::vector<uint32_t >  counts(max_bin);
     for (int i = 0; i < keys.size(); ++i) {
       uint64_t   pos = Predict(keys[i]);

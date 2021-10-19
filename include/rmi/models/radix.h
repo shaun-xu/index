@@ -15,7 +15,7 @@ class   Radix : public Model{
  public:
   template <class  KeyType>
   static  Radix  * New(const std::vector<KeyType>& keys,
-                       const std::vector<uint64_t >& values){
+                       const std::vector<double >& values){
     assert(keys.size() == values.size());
     uint64_t  max_pos = (uint64_t )values[values.size()-1];
     int32_t   bits = NumBits( max_pos);

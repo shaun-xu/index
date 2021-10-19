@@ -11,7 +11,6 @@
 
 namespace  rmi{
 
-
 class   RadixTable: public Model{
  public:
   virtual uint64_t Predict(uint64_t key) {
@@ -26,10 +25,10 @@ class   RadixTable: public Model{
 
   template <class KeyType>
   static  RadixTable  * New(const std::vector<KeyType>& keys,
-                            const std::vector<uint64_t >& values,uint32_t bits){
+                            const std::vector<double >& values,uint32_t bits){
     assert(keys.size() == values.size());
-    auto  prefix = CommonPrefixSize(keys);
-    std::vector<int32_t > table(1<<bits);
+    uint32_t  prefix = CommonPrefixSize(keys);
+    std::vector<uint32_t > table(1<<bits);
     uint64_t   last_radix = 0;
     uint32_t  shift_bits = prefix+bits>64?0:64-prefix-bits;
 
