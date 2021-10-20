@@ -33,6 +33,9 @@ class   Normal : public  Model{
                          const std::vector<double >& values){
 
     assert(keys.size() == values.size());
+    if(keys.size() == 0){
+      return  new Normal(0,0,0);
+    }
     double   mean=0.0;
     double   stdev=0.0;
     double   scale=0.0;

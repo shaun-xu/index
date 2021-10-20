@@ -27,6 +27,10 @@ class   RadixTable: public Model{
   static  RadixTable  * New(const std::vector<KeyType>& keys,
                             const std::vector<double >& values,uint32_t bits){
     assert(keys.size() == values.size());
+    if(keys.size() == 0){
+      std::vector<uint32_t> tmpy;
+      return  new RadixTable(0,0, tmpy);
+    }
     uint32_t  prefix = CommonPrefixSize(keys);
     std::vector<uint32_t > table(1<<bits);
     uint64_t   last_radix = 0;

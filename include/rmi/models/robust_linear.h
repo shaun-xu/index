@@ -16,11 +16,16 @@ namespace   rmi{
 class   RobustLinear:public  Model{
  public:
 
-  virtual double PredictFloat(uint64_t key) { return std::fma(key, m_nA, m_nB); }
+  virtual double PredictFloat(uint64_t key) { return fma(key, m_nA, m_nB); }
 
   template <class  KeyType>
   static  RobustLinear * New(const std::vector<KeyType>& keys,const std::vector<double>& values){
     assert(keys.size() == values.size());
+    if(keys.size() == 0){
+      std::vector<uint32_t> tmpy;
+      return  new RobustLinear(0,0);
+    }
+
     uint32_t   bnd = std::max(double(1),  keys.size() * 0.0001);
     std::pair<double,double>  result = SlrSkip(keys,values, bnd);
     return new RobustLinear(result.first,result.second);

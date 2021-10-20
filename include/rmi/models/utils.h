@@ -86,7 +86,6 @@ std::pair<double,double>    SlrSkip(const std::vector<uint64_t>& keys,
 
     double dx2 = x - mean_x;
     m2 += dx * dx2;
-    data_size += 1;
   }
 
   // special case when we have 0 or 1 items

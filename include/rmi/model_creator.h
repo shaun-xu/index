@@ -41,13 +41,13 @@ class   ModelCreator{
     if (name == "cubic"){
       return CubicSpline::New<KeyType>(keys,values);
     }
-    if(name == "loglinear"){
+    if(name == "log_linear"){
       return  LogLinear::New<KeyType>(keys,values);
     }
     if( name == "normal"){
       return  Normal::New<KeyType>(keys,values);
     }
-    if(name == "lognormal"){
+    if(name == "log_normal"){
       return LogNormal::New<KeyType>(keys,values);
     }
     if( name == "radix"){

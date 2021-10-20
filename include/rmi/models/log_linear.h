@@ -14,17 +14,25 @@
 namespace   rmi{
 class   LogLinear : public Model{
  public:
-  virtual double PredictFloat(uint64_t key) { return exp( std::fma(key, m_a, m_b)) ; }
+  virtual double PredictFloat(uint64_t key) {
+    return Exp1( fma(key, m_a, m_b)) ;
+  }
 
   template <class  KeyType>
   static LogLinear * New(const std::vector<KeyType>& keys,
                           const std::vector<double >& values) {
-    std::vector<double>  log_value;
-    log_value.reserve(values.size());
-    for (int i = 0; i < values.size(); ++i) {
-      log_value.push_back( log(values[i]));
+    assert(keys.size() == values.size());
+    if(keys.size() == 0){
+      return  new LogLinear(0,0);
     }
-    std::pair<double,double>  data = Slr(keys,values);
+
+    std::vector<double>  log_value;
+    log_value.resize(values.size());
+    for (int i = 0; i < values.size(); ++i) {
+      log_value[i]=( log(values[i]));
+    }
+
+    std::pair<double,double>  data = Slr(keys,log_value);
     return new LogLinear(data.first,data.second);
   }
 

@@ -28,9 +28,9 @@ class   CubicSpline : public  Model{
  public:
   virtual double PredictFloat(uint64_t key) {
     // out=ax^3+bx^2+cx+d
-    double   tmp = std::fma(m_nA,(double )key,m_nB);
-    tmp= std::fma(tmp,key,m_nC);
-    tmp = std::fma(tmp,key,m_nD);
+    double   tmp = fma(m_nA,(double )key,m_nB);
+    tmp= fma(tmp,key,m_nC);
+    tmp = fma(tmp,key,m_nD);
     return tmp;
   }
 
@@ -38,6 +38,9 @@ class   CubicSpline : public  Model{
   static  CubicSpline * New(const std::vector<KeyType>& keys,
                           const std::vector<double >& values){
     assert(keys.size() == values.size());
+    if(keys.size() == 0){
+      return  new CubicSpline(0,0,0, 0);
+    }
     //cubic模型包含了线性模型，比较两者最优的
     LinearModel * liner = LinearModel::New(keys, values);
     stCubic  cubic = Cubic(keys,values);

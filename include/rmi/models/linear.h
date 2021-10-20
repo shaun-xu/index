@@ -15,11 +15,17 @@ namespace rmi {
 
 class LinearModel : public Model{
  public:
-  virtual double PredictFloat(uint64_t key) { return std::fma(key, m_a, m_b); }
+  virtual double PredictFloat(uint64_t key) { return fma(key, m_a, m_b); }
 
   template <class KeyType>
   static LinearModel*  New(const std::vector<KeyType>& keys,
                           const std::vector<double >& values) {
+
+    assert(keys.size() == values.size());
+    if(keys.size() == 0){
+      return  new LinearModel(0,0);
+    }
+
     std::pair<double,double>  data = Slr(keys,values);
     return new LinearModel(data.first,data.second);
   }

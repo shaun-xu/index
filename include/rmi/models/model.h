@@ -29,7 +29,7 @@ class Model {
     return std::max(0.0, floor(PredictFloat(key)) );
   }
 
-  std::string   Name(){return "model";}
+  virtual  std::string   Name()=0;
 
   bool NeedsBoundCheck() { return true; }
 

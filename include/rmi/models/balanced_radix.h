@@ -52,6 +52,11 @@ class   BalancedRadix : public Model{
   static  BalancedRadix * New(const std::vector<KeyType>& keys,
                               const std::vector<double >& values){
 
+    assert(keys.size() == values.size());
+    if(keys.size() == 0){
+      return  new BalancedRadix(0,0,0, true);
+    }
+
     uint64_t   larget = values[values.size()-1];
     uint32_t   bits = NumBits(larget);
     uint32_t   range  = bits+2>64?64:bits+2;
@@ -87,10 +92,11 @@ class   BalancedRadix : public Model{
     double expected = (double )keys.size()/ (double )max_bin;
     double sum =0.0;
     for (int i = 0; i < counts.size(); ++i) {
-       sum += std::pow(  double (counts[i])-expected , 2.0)/expected;
+       sum += pow(  double (counts[i])-expected , 2.0)/expected;
     }
     return  sum;
   }
+  std::string  Name(){ return "bradix";}
 
  private:
   BalancedRadix(){

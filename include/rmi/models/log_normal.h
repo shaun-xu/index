@@ -24,7 +24,10 @@ class     LogNormal: public Normal{
   template <class  KeyType>
   static   LogNormal * New(const std::vector<KeyType>& keys,
                              const std::vector<double >& values){
-      assert(keys.size() == values.size());
+    assert(keys.size() == values.size());
+    if(keys.size() == 0){
+      return  new LogNormal(0,0,0);
+    }
       double   mean=0.0;
       double   stdev=0.0;
       double   scale=0.0;
