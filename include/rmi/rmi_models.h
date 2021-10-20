@@ -163,6 +163,19 @@ class RMIModels {
     retmodel->CalError(keys, values);
     return retmodel;
   }
+  ~RMIModels(){
+    if(m_pFirstLayer){
+      delete m_pFirstLayer;
+      m_pFirstLayer =NULL;
+    }
+    for (int i = 0; i < m_vSecondLayer.size(); ++i) {
+      if(m_vSecondLayer[i]){
+        delete m_vSecondLayer[i];
+        m_vSecondLayer[i]=NULL;
+      }
+    }
+    m_nMaxPos = 0;
+  }
 
  private:
   RMIModels(Model* top, const std::vector<Model*>& layer, uint64_t max_pos) {
@@ -175,17 +188,6 @@ class RMIModels {
   std::vector<Model*> m_vSecondLayer;  //第二层的模型
   std::vector<uint32_t> m_vError;      //叶子层的差错范围
   uint64_t m_nMaxPos;                  //最大的位置
-
-  //    pub model_avg_error: f64,
-  //    pub model_avg_l2_error: f64,
-  //    pub model_avg_log2_error: f64,
-  //    pub model_max_error: u64,
-  //    pub model_max_error_idx: usize,
-  //    pub model_max_log2_error: f64,
-  //    pub last_layer_max_l1s: Vec<u64>,
-  //    pub rmi: Vec<Vec<Box<dyn Model>>>,
-  //    pub models: String,
-  //    pub branching_factor: u64,
 };
 
 }  // namespace rmi
