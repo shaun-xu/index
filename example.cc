@@ -16,6 +16,8 @@
 #include "include/ts/builder.h"
 #include "include/ts/common.h"
 #include "include/rmi/builder.h"
+#include "include/rmi/radix_spline.h"
+#include "include/rmi/rmi_spline.h"
 
 using namespace std;
 
@@ -117,6 +119,21 @@ void    TestOne(){
   //  }
 }
 
+void    TestRadixSpline(){
+  std::vector<uint64_t> keys(200000000);
+  generate(keys.begin(), keys.end(), rand);
+//  keys.push_back(424242);
+  std::sort(keys.begin(), keys.end());
+
+
+  std::vector<double>  values(keys.size());
+  for (int i = 0; i < keys.size(); ++i) {
+    values[i]=i;
+  }
+
+  rmi::RadixSpline<uint64_t >  *model= new rmi::RadixSpline<uint64_t >(keys,values, 50);
+
+}
 
 void    TestBuilder(){
   std::vector<uint64_t> keys(1e6);
@@ -166,11 +183,32 @@ void    TestBuilder(const string& data_file, const string lookup_file){
   }
 }
 
+void  TestRMISpline(){
+  std::vector<uint64_t> keys(10000000);
+  generate(keys.begin(), keys.end(), rand);
+//  keys.push_back(424242);
+  std::sort(keys.begin(), keys.end());
+  std::vector<double>  values(keys.size());
+  for (int i = 0; i < keys.size(); ++i) {
+    values[i]=i;
+  }
+
+  rmi::Builder<uint64_t >::Build(keys,values);
+//  model->GetSearchBound(1000);
+//  for (int i = 0; i < keys.size(); ++i) {
+//    rmi::SearchBound bond = model->GetSearchBound(keys[i]);
+//    assert(i >=bond.begin  && i<= bond.end );
+//  }
+  std::cout<<"success!"<<std::endl;
+}
+
 int main(int argc, char** argv) {
   //  TrieSplineExample();
   //  rmi::BalancedRadix::Test();
+//  TestRadixSpline();
+  TestRMISpline();
+//  TestBuilder();
 
-  TestBuilder();
 //  、、
 //  std::vector<uint64_t> keys(65000);
 //  std::vector<double> values(65000);

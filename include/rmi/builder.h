@@ -15,6 +15,7 @@
 #include "models/radix_table.h"
 #include "models/robust_linear.h"
 #include "rmi_models.h"
+#include "rmi_spline.h"
 
 namespace  rmi{
 
@@ -29,16 +30,18 @@ class   Builder{
     //根据数据选择最适宜的模型进行计算。
     for (int k = 0; k < submodels.size(); ++k) {
       //在这里方便对value进行一次缩放多次使用吧
-      std::vector<double>     first_layer_data(values);
-      double  datasize = (double)first_layer_data.size();
-      for (int i = 0; i < datasize; ++i) {
-        first_layer_data[i] = (double)values[i]*((double)submodels.size())/(double )datasize;
+      std::vector<double>     first_layer_data(submodels[k]);
+      uint32_t   permode_count = values.size()/submodels[k];
+//      double  datasize = (double)first_layer_data.size();
+      for (int i = 0; i < submodels[k]; ++i) {
+        first_layer_data[i] = values[permode_count*i];//(double)values[i]*((double)submodels.size())/(double )datasize;
       }
       for (int i = 0; i < top_layers.size(); ++i) {
         for (int j = 0; j < leaf_layers.size(); ++j) {
-          RMIModels<KeyType>* model = RMIModels<KeyType>::New(
-              top_layers[i], leaf_layers[j], keys, values, submodels[k],first_layer_data);
+          RMISpline<KeyType>* model = RMISpline<KeyType>::New(
+              top_layers[i], leaf_layers[j],submodels[k], keys, values,10);
           assert(model);
+//          model->DumpLayerErr();
         }
       }
     }
@@ -52,7 +55,7 @@ const    std::vector<std::string>  Builder<KeyType>::top_layers({"linear", "robu
 template <class KeyType>
 const    std::vector<std::string>  Builder<KeyType>::leaf_layers({"linear", "robust_linear","linear_spline","cubic","log_linear","normal","log_normal" });
 template <class KeyType>
-const    std::vector<uint32_t >   Builder<KeyType>::submodels({2<<5,2<<6,2<<7,2<<8,2<<9,2<<10,2<<11,2<<12,2<<13,2<<14});
+const    std::vector<uint32_t >   Builder<KeyType>::submodels({2<<5,2<<6,2<<7,2<<8,2<<9,2<<10});
 
 //const    std::vector<uint32_t >   Builder<KeyType>::submodels({2<<5,2<<6,2<<7,2<<8,2<<9,2<<10,2<<11,2<<12,2<<13,2<<14,2<<15,2<<16,2<<17,2<<18,2<<19,2<<20,2<<21,2<<22,2<<23,2<<24,2<<25});
 

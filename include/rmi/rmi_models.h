@@ -9,6 +9,7 @@
 
 #include "model_creator.h"
 #include "models/model.h"
+#include <sstream>
 
 
 namespace rmi {
@@ -41,6 +42,19 @@ class RMIModels {
     //    const double key_diff = key - down.x;
     //    return std::fma(key_diff, slope, down.y);
   }
+
+  void  DumpLayerErr(){
+    std::ostringstream  os;
+    for (int i = 0; i < m_vError.size(); ++i) {
+      if(i%20==0 && i!=0){
+        std::cout<<os.str()<<std::endl;
+        os.str("");
+      }
+      os<<i<<"_"<<m_vCounts[i]<<"_"<<m_vError[i]<<",";
+    }
+    std::cout<<os.str()<<std::endl;
+  }
+
 
   // Returns a search bound [begin, end) around the estimated position.
   SearchBound GetSearchBound(const KeyType key) const {
@@ -79,6 +93,7 @@ class RMIModels {
     //    }
     uint64_t max_pos = values[values.size() - 1];
     m_vError.resize(m_vSecondLayer.size());
+    m_vCounts.resize(m_vSecondLayer.size());
     for (int i = 0; i < keys.size(); ++i) {
       uint32_t _model = m_pFirstLayer->Predict(keys[i]);
       uint32_t _model_predict =
@@ -92,6 +107,7 @@ class RMIModels {
       if(_cur_err > 10){
 //        std::cout<<"big error="<<_cur_err<<",i="<<i<<",key="<<keys[i]<<",model="<<_model_predict<<",pos="<<_pos_predict<<",real="<<values[i]<<std::endl;
       }
+      m_vCounts[_model_predict]++;
       m_vError[_model_predict] = std::max(
           (uint32_t)m_vError[_model_predict],
           _cur_err);
@@ -187,6 +203,7 @@ class RMIModels {
   Model* m_pFirstLayer;                //第一层的模型
   std::vector<Model*> m_vSecondLayer;  //第二层的模型
   std::vector<uint32_t> m_vError;      //叶子层的差错范围
+  std::vector<uint32_t > m_vCounts;   //叶子层的数据数量
   uint64_t m_nMaxPos;                  //最大的位置
 };
 
