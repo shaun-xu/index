@@ -52,15 +52,15 @@ class   RMISpline  {
     }
     //2: 在spline points的基础上构造 rmi结构体。
 //    if(  rmi_leaf != ""){
-      std::vector<double>     first_layer_data(train_values);
-      double  datasize = (double)first_layer_data.size();
-      for (int i = 0; i < datasize; ++i) {
-        first_layer_data[i] = (double)train_values[i]*(sub_models)/(double )datasize;
-      }
-      // 3层模式
-      RMIModels<KeyType>* model = RMIModels<KeyType>::New(
-          rmi_top, rmi_leaf, train_keys, train_values, sub_models,first_layer_data);
-      return  new RMISpline<KeyType>(spline_points, model,  radix);
+    std::vector<double>     first_layer_data(train_values);
+    double  datasize = (double)first_layer_data.size();
+    for (int i = 0; i < datasize; ++i) {
+      first_layer_data[i] = (double)train_values[i]*(sub_models)/(double )datasize;
+    }
+    // 3层模式
+    RMIModels<KeyType>* model = RMIModels<KeyType>::New(
+        rmi_top, rmi_leaf, train_keys, train_values, sub_models,first_layer_data);
+    return  new RMISpline<KeyType>(spline_points, model,  radix);
   }
  private:
   uint32_t   GetSplinePoint(const KeyType key){
@@ -69,7 +69,7 @@ class   RMISpline  {
     if (first_bound.end - first_bound.begin < 32) {
       // Do linear search over narrowed range.
       uint32_t current = first_bound.begin;
-      while (m_vSplinePoints[current].x < key) ++current;
+      while (m_vSplinePoints[current].x < key  && current<first_bound.end) ++current;
       return current;
     }
 
