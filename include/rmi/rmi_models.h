@@ -50,7 +50,7 @@ class RMIModels {
         std::cout<<os.str()<<std::endl;
         os.str("");
       }
-      os<<i<<"_"<<m_vCounts[i]<<"_"<<m_vError[i]<<",";
+      os<<i<<"_"<<m_vCounts[i]<<"_"<<m_vError[i]<<"_"<<m_vMinMax[i].begin<<"_"<<m_vMinMax[i].end<<std::endl;
     }
     std::cout<<os.str()<<std::endl;
   }
@@ -78,28 +78,30 @@ class RMIModels {
   //计算该模型的叶子阶层的的损失。
   void CalError(const std::vector<KeyType>& keys,
                 const std::vector<double>& values) {
-    //    let mut last_layer_max_l1s = vec![(0, 0) ; num_leaf_models as usize];
-    //    for (x, y) in md_container.iter_model_input() {
-    //        let leaf_idx = top_model.predict_to_int(&x);
-    //        let target = u64::min(num_leaf_models - 1, leaf_idx) as usize;
-    //
-    //        let pred = leaf_models[target].predict_to_int(&x);
-    //        let err = error_between(pred, y as u64, md_container.len() as
-    //        u64);
-    //
-    //        let cur_val = last_layer_max_l1s[target];
-    //        last_layer_max_l1s[target] = (cur_val.0 + 1, u64::max(err,
-    //        cur_val.1));
-    //    }
     uint64_t max_pos = values[values.size() - 1];
     m_vError.resize(m_vSecondLayer.size());
     m_vCounts.resize(m_vSecondLayer.size());
+    m_vMinMax.resize(m_vSecondLayer.size());
+    m_vMinMaxPos.resize(m_vSecondLayer.size());
+    for (int i = 0; i < m_vMinMax.size(); ++i) {
+      m_vMinMax[i].begin=(size_t)(-1);
+      m_vMinMax[i].end = 0;
+    }
     for (int i = 0; i < keys.size(); ++i) {
+      if(i==7638920){
+        std::cout<<"here"<<std::endl;
+      }
       uint32_t _model = m_pFirstLayer->Predict(keys[i]);
       uint32_t _model_predict =
           _model > m_vSecondLayer.size() - 1
               ? m_vSecondLayer.size() - 1
               : _model;  // std::min(_model,  m_vSecondLayer.size()-1);
+      if(m_vMinMax[_model_predict].begin > keys[i]){
+        m_vMinMax[_model_predict].begin = keys[i];
+      }
+      if(m_vMinMax[_model_predict].end<keys[i]){
+        m_vMinMax[_model_predict].end= keys[i];
+      }
       uint64_t _pos = m_vSecondLayer[_model_predict]->Predict(keys[i]);
       uint64_t _pos_predict = std::min(_pos, max_pos - 1);
       uint32_t _cur_err =(uint32_t)(_pos_predict > values[i] ? _pos_predict - values[i]
@@ -112,6 +114,8 @@ class RMIModels {
           (uint32_t)m_vError[_model_predict],
           _cur_err);
     }
+    //此处还需要校正两个模型之间的点，如果把后面的模型
+
     std::vector<uint32_t>::iterator min_e_pos = std::min_element(m_vError.begin(),m_vError.end());
     std::vector<uint32_t>::iterator max_e_pos = std::max_element(m_vError.begin(),m_vError.end());
 
@@ -204,6 +208,8 @@ class RMIModels {
   std::vector<Model*> m_vSecondLayer;  //第二层的模型
   std::vector<uint32_t> m_vError;      //叶子层的差错范围
   std::vector<uint32_t > m_vCounts;   //叶子层的数据数量
+  std::vector<SearchBound>  m_vMinMax;  //最小的和最大的key
+  std::vector<SearchBound>  m_vMinMaxPos;  //最小的和最大的key对应的位置
   uint64_t m_nMaxPos;                  //最大的位置
 };
 

@@ -193,12 +193,16 @@ void  TestRMISpline(){
     values[i]=i;
   }
 
-  rmi::Builder<uint64_t >::Build(keys,values);
+//  rmi::Builder<uint64_t >::Build(keys,values);
+  rmi::RMISpline<uint64_t >  *model = rmi::RMISpline<uint64_t >::New("linear","linear", 512,keys,values,10);
 //  model->GetSearchBound(1000);
-//  for (int i = 0; i < keys.size(); ++i) {
-//    rmi::SearchBound bond = model->GetSearchBound(keys[i]);
-//    assert(i >=bond.begin  && i<= bond.end );
-//  }
+  for (int i = 0; i < keys.size(); ++i) {
+    if(i==7638920){
+      std::cout<<"here"<<std::endl;
+    }
+    rmi::SearchBound bond = model->GetSearchBound(keys[i]);
+    assert(i >=bond.begin  && i<= bond.end );
+  }
   std::cout<<"success!"<<std::endl;
 }
 
