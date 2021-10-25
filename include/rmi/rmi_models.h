@@ -20,6 +20,16 @@ struct SearchBound {
 };
 
 template <class KeyType>
+struct   KeyPos{
+  bool    valid;
+  KeyType   key;
+  double    pos;
+  KeyPos(){
+    valid=false;
+  }
+};
+
+template <class KeyType>
 class RMIModels {
  public:
   // Returns the estimated position of `key`.
@@ -83,10 +93,24 @@ class RMIModels {
     m_vCounts.resize(m_vSecondLayer.size());
     m_vMinMax.resize(m_vSecondLayer.size());
     m_vMinMaxPos.resize(m_vSecondLayer.size());
+    m_vNext.resize(m_vSecondLayer.size());
+    m_vPrev.resize(m_vSecondLayer.size());
+
+    std::vector<  KeyPos<KeyType> >  tmpFirst;
+    std::vector<  KeyPos<KeyType> >  tmpLast;
+    tmpFirst.resize(m_vSecondLayer.size());
+    tmpLast.resize(m_vSecondLayer.size());
+
+
     for (int i = 0; i < m_vMinMax.size(); ++i) {
       m_vMinMax[i].begin=(size_t)(-1);
       m_vMinMax[i].end = 0;
+      tmpFirst[i].valid = false;
+      tmpLast[i].valid=false;
     }
+    uint32_t   pre_model =0;
+    KeyPos<KeyType>   last_key;
+
     for (int i = 0; i < keys.size(); ++i) {
       if(i==7638920){
         std::cout<<"here"<<std::endl;
@@ -96,12 +120,26 @@ class RMIModels {
           _model > m_vSecondLayer.size() - 1
               ? m_vSecondLayer.size() - 1
               : _model;  // std::min(_model,  m_vSecondLayer.size()-1);
+
+      if(tmpFirst[_model_predict].valid == false){
+        tmpFirst[_model_predict].valid=true;
+        tmpFirst[_model_predict].key = keys[i];
+        tmpFirst[_model_predict].pos = values[i];
+      }
+      {  //直接更新tmpLast
+        tmpLast[_model_predict].valid=true;
+        tmpLast[_model_predict].key = keys[i];
+        tmpLast[_model_predict].pos = values[i];
+      }
+
       if(m_vMinMax[_model_predict].begin > keys[i]){
         m_vMinMax[_model_predict].begin = keys[i];
       }
+
       if(m_vMinMax[_model_predict].end<keys[i]){
         m_vMinMax[_model_predict].end= keys[i];
       }
+
       uint64_t _pos = m_vSecondLayer[_model_predict]->Predict(keys[i]);
       uint64_t _pos_predict = std::min(_pos, max_pos - 1);
       uint32_t _cur_err =(uint32_t)(_pos_predict > values[i] ? _pos_predict - values[i]
@@ -113,8 +151,36 @@ class RMIModels {
       m_vError[_model_predict] = std::max(
           (uint32_t)m_vError[_model_predict],
           _cur_err);
+      last_key.pos = values[i];
+      last_key.key = keys[i];
+
     }
     //此处还需要校正两个模型之间的点，如果把后面的模型
+    //TODO  这里应该是最大的 和 最小的值的位置。
+    m_vPrev[0].pos = 0;
+    m_vPrev[0].key = keys[0];
+    m_vNext[m_vSecondLayer.size()-1].key = keys[keys.size()-1];
+    m_vNext[m_vSecondLayer.size()-1].pos = values[keys.size()-1];
+    for(int  i=1; i< m_vSecondLayer.size()-1; i++){
+        int   prev = getPrev( i, tmpFirst);
+        int   next = getNext(i,  tmpLast);
+        m_vNext[i] = tmpLast[next];
+        m_vPrev[i] = tmpFirst[prev];
+
+    }
+    for( int i=0;  i<m_vSecondLayer.size(); i++){
+      uint64_t next_pre_pos = m_vSecondLayer[i]->Predict(m_vNext[i].key);
+      uint64_t _pos_next = std::min(next_pre_pos, max_pos - 1);
+      uint64_t prev_pre_pos = m_vSecondLayer[i]->Predict(m_vPrev[i].key);
+      uint64_t _pos_prev = std::min(prev_pre_pos, max_pos - 1);
+      int   next_err = _pos_next> m_vNext[i].pos?_pos_next-m_vNext[i].pos:m_vNext[i].pos-_pos_next;
+      int   prev_err = _pos_prev>m_vPrev[i].pos?_pos_prev-m_vPrev[i].pos:m_vPrev[i].pos-_pos_prev;
+      int  final_max_err =  std::max(prev_err, next_err);
+      if( final_max_err > m_vError[i] &&   final_max_err-m_vError[i]>100 ){
+        std::cout<<"big correaltion "<<i<<","<<next_err<<","<<prev_err<<","<<m_vError[i]<<","<<final_max_err - m_vError[i]<<std::endl;
+      }
+      m_vError[i] = std::max((uint32_t )final_max_err, m_vError[i]);
+    }
 
     std::vector<uint32_t>::iterator min_e_pos = std::min_element(m_vError.begin(),m_vError.end());
     std::vector<uint32_t>::iterator max_e_pos = std::max_element(m_vError.begin(),m_vError.end());
@@ -123,13 +189,6 @@ class RMIModels {
               <<*max_e_pos
               <<","<<*min_e_pos
               <<std::endl;
-//    for (int i = 0; i < m_vError.size(); ++i) {
-//      if (i % 10 == 0) {
-//        std::cout << "" << std::endl;
-//      }
-//
-//      std::cout << m_vError[i] << ",";
-//    }
 
   }
 
@@ -204,6 +263,24 @@ class RMIModels {
     m_vSecondLayer = std::move(layer);
   }
 
+  int   getNext(uint32_t  start_pos, const  std::vector<  KeyPos<KeyType> >  &next_array){
+    for (int i = start_pos+1; i <next_array.size() ; ++i) {
+      if(next_array[i].valid){
+        return   i;
+      }
+    }
+    return next_array.size()-1;
+  }
+
+  int   getPrev(uint32_t  start_pos, const  std::vector<  KeyPos<KeyType> >  &prev_array){
+    for(   int i=start_pos-1;  i>=0;  i--){
+      if(prev_array[i].valid){
+        return   i;
+      }
+    }
+    return 0;
+  }
+
   Model* m_pFirstLayer;                //第一层的模型
   std::vector<Model*> m_vSecondLayer;  //第二层的模型
   std::vector<uint32_t> m_vError;      //叶子层的差错范围
@@ -211,6 +288,8 @@ class RMIModels {
   std::vector<SearchBound>  m_vMinMax;  //最小的和最大的key
   std::vector<SearchBound>  m_vMinMaxPos;  //最小的和最大的key对应的位置
   uint64_t m_nMaxPos;                  //最大的位置
+  std::vector< KeyPos<KeyType>  >     m_vNext;   //下一个
+  std::vector< KeyPos<KeyType>  >     m_vPrev;   //下一个
 };
 
 }  // namespace rmi

@@ -16,6 +16,7 @@
 #include "models/robust_linear.h"
 #include "rmi_models.h"
 #include "rmi_spline.h"
+#include <chrono>
 
 namespace  rmi{
 
@@ -41,10 +42,26 @@ class   Builder{
           RMISpline<KeyType>* model = RMISpline<KeyType>::New(
               top_layers[i], leaf_layers[j],submodels[k], keys, values,10);
           assert(model);
+          //计算时间
+          TestModel(keys,values,model);
+          delete model;
 //          model->DumpLayerErr();
         }
       }
     }
+  }
+
+  static void TestModel(const std::vector<KeyType> &keys, const std::vector<double > &values , RMISpline<KeyType> *model){
+    auto  begin = std::chrono::high_resolution_clock::now();
+    for (int i = 0; i < keys.size(); ++i) {
+      rmi::SearchBound bond = model->GetSearchBound(keys[i]);
+      assert(i >=bond.begin  && i<= bond.end );
+    }
+    auto  end = std::chrono::high_resolution_clock::now();
+    uint64_t build_ns =
+        std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin)
+            .count();
+    std::cout<<"outputresult:"<<model->Name()<<","<<build_ns<<std::endl;
   }
 
  private:

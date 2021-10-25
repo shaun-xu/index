@@ -33,6 +33,9 @@ class   RMISpline  {
     return  m_pSecond->GetSearchBound(key, splint_index);
   }
 
+  std::string  Name(){
+    return m_strName;
+  }
 
   static  RMISpline *  New(const std::string &rmi_top,
                         const std::string &rmi_leaf,
@@ -60,8 +63,23 @@ class   RMISpline  {
     // 3层模式
     RMIModels<KeyType>* model = RMIModels<KeyType>::New(
         rmi_top, rmi_leaf, train_keys, train_values, sub_models,first_layer_data);
-    return  new RMISpline<KeyType>(spline_points, model,  radix);
+    std::ostringstream  os;
+    os<<"RMISPline_"<<rmi_top<<"_"<<rmi_leaf<<"_"<<sub_models;
+    return  new RMISpline<KeyType>(spline_points, model,  radix,os.str());
   }
+
+  //析构函数
+  ~RMISpline(){
+      if(m_pFirstLayer != NULL){
+        delete m_pFirstLayer;
+        m_pFirstLayer = NULL;
+      }
+      if(m_pSecond != NULL){
+        delete m_pSecond;
+        m_pSecond = NULL;
+      }
+  }
+
  private:
   uint32_t   GetSplinePoint(const KeyType key){
     SearchBound  first_bound = m_pFirstLayer->GetSearchBound(key);
@@ -82,16 +100,19 @@ class   RMISpline  {
     return std::distance(m_vSplinePoints.begin(), lb);
   }
 
-  RMISpline(const std::vector<Coord<KeyType>>  &spline_points,RMIModels<KeyType>* first, RadixSpline<KeyType> *second ){
+  RMISpline(const std::vector<Coord<KeyType>>  &spline_points,
+            RMIModels<KeyType>* first, RadixSpline<KeyType> *second ,const std::string &name=""){
     m_vSplinePoints = spline_points;
     m_pFirstLayer = first;
     m_pSecond= second;
-    m_pFirstLayer->DumpLayerErr();
+    m_strName = name;
+//    m_pFirstLayer->DumpLayerErr();
   }
 
   std::vector<Coord<KeyType>>   m_vSplinePoints;
   RMIModels<KeyType>*     m_pFirstLayer;
   RadixSpline<KeyType>    *m_pSecond;
+  std::string     m_strName;
 
 };
 
