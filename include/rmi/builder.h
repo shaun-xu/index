@@ -54,6 +54,9 @@ class   Builder{
   static void TestModel(const std::vector<KeyType> &keys, const std::vector<double > &values , RMISpline<KeyType> *model){
     auto  begin = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < keys.size(); ++i) {
+      if( i== 9999826){
+        std::cout<<"here"<<std::endl;
+      }
       rmi::SearchBound bond = model->GetSearchBound(keys[i]);
       assert(i >=bond.begin  && i<= bond.end );
     }

@@ -41,6 +41,9 @@ class RadixSpline {
     for (int i = 0; i < keys.size(); ++i) {
       AddKey(keys[i], values[i]);
     }
+    if (curr_num_keys_ > 0 && spline_points_.back().x != prev_key_)
+      AddKeyToSpline(prev_key_, prev_position_);
+
     std::cout << "final" << std::endl;
   }
 
