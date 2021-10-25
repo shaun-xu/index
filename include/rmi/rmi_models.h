@@ -162,12 +162,14 @@ class RMIModels {
     m_vNext[m_vSecondLayer.size()-1].key = keys[keys.size()-1];
     m_vNext[m_vSecondLayer.size()-1].pos = values[keys.size()-1];
     for(int  i=1; i< m_vSecondLayer.size()-1; i++){
-        int   prev = getPrev( i, tmpFirst);
-        int   next = getNext(i,  tmpLast);
-        m_vNext[i] = tmpLast[next];
-        m_vPrev[i] = tmpFirst[prev];
+        int   prev = getPrev( i, tmpLast);
+        int   next = getNext(i,  tmpFirst);
+        m_vNext[i] = tmpFirst[next];
+        m_vPrev[i] = tmpLast[prev];
 
     }
+    m_vNext[0] =  tmpFirst[1];
+    m_vPrev[ m_vSecondLayer.size()-1] = tmpLast[m_vSecondLayer.size()-2];
     for( int i=0;  i<m_vSecondLayer.size(); i++){
       uint64_t next_pre_pos = m_vSecondLayer[i]->Predict(m_vNext[i].key);
       uint64_t _pos_next = std::min(next_pre_pos, max_pos - 1);
@@ -176,6 +178,7 @@ class RMIModels {
       int   next_err = _pos_next> m_vNext[i].pos?_pos_next-m_vNext[i].pos:m_vNext[i].pos-_pos_next;
       int   prev_err = _pos_prev>m_vPrev[i].pos?_pos_prev-m_vPrev[i].pos:m_vPrev[i].pos-_pos_prev;
       int  final_max_err =  std::max(prev_err, next_err);
+//      std::cout<<"recorrealtion "<<i<<",prev_key="<<m_vPrev[i].key<<",prev_pos="<<m_vPrev[i].pos<<",next_key="<<m_vNext[i].key<<",next_pos="<<m_vNext[i].pos<<",next_pre_pos="<<_pos_next<<",pre_prev_pos="<<_pos_prev<<std::endl;
       if( final_max_err > m_vError[i] &&   final_max_err-m_vError[i]>100 ){
         std::cout<<"big correaltion "<<i<<","<<next_err<<","<<prev_err<<","<<m_vError[i]<<","<<final_max_err - m_vError[i]<<std::endl;
       }
@@ -240,6 +243,7 @@ class RMIModels {
     RMIModels<KeyType>* retmodel =
         new RMIModels<KeyType>(firstmod, sub_models, values[values.size() - 1]);
     retmodel->CalError(keys, values);
+    retmodel->DumpLayerErr();
     return retmodel;
   }
   ~RMIModels(){
