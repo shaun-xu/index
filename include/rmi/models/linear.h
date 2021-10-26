@@ -8,7 +8,7 @@
 #include <math.h>  /* fma, FP_FAST_FMA */
 #include <stdio.h> /* printf */
 #include "model.h"
-#include "utils.h"
+#include "./utils.h"
 #include <string>
 
 namespace rmi {

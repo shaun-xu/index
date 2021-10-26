@@ -7,6 +7,7 @@
 #include "include/rs/multi_map.h"
 #include "include/ts/builder.h"
 #include "include/ts/ts.h"
+#include "include/rmi/builder.h"
 
 using namespace std;
 
@@ -340,6 +341,22 @@ struct Lookup {
 };
 
 template <class KeyType>
+void RunRMI(const string& data_file, const string lookup_file) {
+  // Load data
+  std::cerr << "Load data.." << std::endl;
+  vector<KeyType> keys = util::load_data<KeyType>(data_file);
+
+  std::vector<double>  values(keys.size());
+  vector<rmi::Lookup<KeyType>> lookups =
+      util::load_data<rmi::Lookup<KeyType>>(lookup_file);
+  for (int i = 0; i < keys.size(); ++i) {
+    values[i]=i;
+  }
+  rmi::Builder<KeyType>::Build(keys,values,lookups);
+}
+
+
+template <class KeyType>
 void RunRS(const string& data_file, const string lookup_file) {
   // Load data
   vector<KeyType> keys = util::load_data<KeyType>(data_file);
@@ -472,7 +489,7 @@ void CustomRunTS(const string& data_file, const string lookup_file, const uint32
 
 int main(int argc, char** argv) {
   if ((argc != 4) && (argc != 5)) {
-    std::cout << "usage: " << argv[0] << " <data_file> <lookup_file> <index(rs|ts)> [max_error]" << endl;
+    std::cout << "usage: " << argv[0] << " <data_file> <lookup_file> <index(rs|ts|rmi)> [max_error]" << endl;
     exit(-1);
   }
 
@@ -486,6 +503,8 @@ int main(int argc, char** argv) {
       RunRS<uint32_t>(data_file, lookup_file);
     else if ((index_type == "ts") && (!max_error))
       RunTS<uint32_t>(data_file, lookup_file);
+    else if(index_type == "rmi")
+      RunRMI<uint32_t >(data_file, lookup_file);
     else
       CustomRunTS<uint32_t>(data_file, lookup_file, max_error);
   } else {
@@ -493,6 +512,8 @@ int main(int argc, char** argv) {
       RunRS<uint64_t>(data_file, lookup_file);
     else if ((index_type == "ts") && (!max_error))
       RunTS<uint64_t>(data_file, lookup_file);
+    else if(index_type == "rmi")
+      RunRMI<uint64_t >(data_file, lookup_file);
     else
       CustomRunTS<uint64_t>(data_file, lookup_file, max_error);
   }

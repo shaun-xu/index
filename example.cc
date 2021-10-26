@@ -84,6 +84,9 @@ struct Lookup {
   uint64_t value;
 };
 
+
+
+
 void    TestOne(){
   std::vector<uint64_t> keys(1e6);
   generate(keys.begin(), keys.end(), rand);
@@ -173,14 +176,14 @@ void    TestBuilder(const string& data_file, const string lookup_file){
     values[i]=i;
   }
   rmi::RMIModels<KeyType>  *model = rmi::Builder<KeyType>::Build(keys,values);
-  for (int i = 0; i < lookups.size(); ++i) {
-    rmi::SearchBound bound = model->GetSearchBound(lookups[i].key);
-    if(bound.begin> lookups[i].value ||
-        bound.end  < lookups[i].value) {
-      std::cout<<"error"<<std::endl;
-    }
-
-  }
+//  for (int i = 0; i < lookups.size(); ++i) {
+//    rmi::SearchBound bound = model->GetSearchBound(lookups[i].key);
+//    if(bound.begin> lookups[i].value ||
+//        bound.end  < lookups[i].value) {
+//      std::cout<<"error"<<std::endl;
+//    }
+//
+//  }
 }
 
 void  TestRMISpline(){
@@ -210,7 +213,9 @@ int main(int argc, char** argv) {
   //  TrieSplineExample();
   //  rmi::BalancedRadix::Test();
 //  TestRadixSpline();
-  TestRMISpline();
+//  TestRMISpline();
+
+
 //  TestBuilder();
 
 //  、、

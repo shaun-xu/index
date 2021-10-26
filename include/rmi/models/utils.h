@@ -64,8 +64,8 @@ double   Exp1(double  x){
   x *= x;
   return x;
 }
-
-std::pair<double,double>    SlrSkip(const std::vector<uint64_t>& keys,
+template<class KeyType>
+std::pair<double,double>    SlrSkip(const std::vector<KeyType>& keys,
                                 const std::vector<double>& values,uint32_t skip){
   double mean_x = 0.0;
   double mean_y = 0.0;
@@ -110,8 +110,8 @@ std::pair<double,double>    SlrSkip(const std::vector<uint64_t>& keys,
   return std::pair<double,double>(beta, alpha);
 }
 
-
-std::pair<double,double>    Slr(const std::vector<uint64_t>& keys,
+template<class KeyType>
+std::pair<double,double>    Slr(const std::vector<KeyType>& keys,
                                        const std::vector<double>& values){
   double mean_x = 0.0;
   double mean_y = 0.0;

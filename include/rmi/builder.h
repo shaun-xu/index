@@ -16,9 +16,17 @@
 #include "models/robust_linear.h"
 #include "rmi_models.h"
 #include "rmi_spline.h"
+
 #include <chrono>
 
 namespace  rmi{
+
+template <class KeyType>
+struct Lookup {
+  KeyType key;
+  uint64_t value;
+};
+
 
 template <class KeyType>
 class   Builder{
@@ -27,7 +35,8 @@ class   Builder{
   const static   std::vector<std::string>  leaf_layers;//{"linear", "robust_linear","linear_spline","cubic","loglinear","normal","lognormal" };
   const static   std::vector<uint32_t >   submodels;//{2<<5,2<<6,2<<7,2<<8,2<<9,2<<10,2<<11,2<<12,2<<13,2<<14,2<<15,2<<16,2<<17,2<<18,2<<19,2<<20,2<<21,2<<22,2<<23,2<<24,2<<25};
 
-  static  RMIModels<KeyType>  *Build(const std::vector<KeyType> &keys, const std::vector<double > &values){
+  static  RMIModels<KeyType>  *Build(const std::vector<KeyType> &keys, const std::vector<double > &values,
+                                   const std::vector<Lookup<KeyType> >  &tests){
     //根据数据选择最适宜的模型进行计算。
     for (int k = 0; k < submodels.size(); ++k) {
       //在这里方便对value进行一次缩放多次使用吧
@@ -43,7 +52,7 @@ class   Builder{
               top_layers[i], leaf_layers[j],submodels[k], keys, values,10);
           assert(model);
           //计算时间
-          TestModel(keys,values,model);
+          TestModel(tests,model);
           delete model;
 //          model->DumpLayerErr();
         }
@@ -51,11 +60,11 @@ class   Builder{
     }
   }
 
-  static void TestModel(const std::vector<KeyType> &keys, const std::vector<double > &values , RMISpline<KeyType> *model){
+  static void TestModel(const std::vector< Lookup<KeyType> > &tests , RMISpline<KeyType> *model){
     auto  begin = std::chrono::high_resolution_clock::now();
-    for (int i = 0; i < keys.size(); ++i) {
-      rmi::SearchBound bond = model->GetSearchBound(keys[i]);
-      assert(i >=bond.begin  && i<= bond.end );
+    for (int i = 0; i < tests.size(); ++i) {
+      rmi::SearchBound bond = model->GetSearchBound(tests[i].key);
+      assert(tests[i].value >=bond.begin  && tests[i].value<= bond.end );
     }
     auto  end = std::chrono::high_resolution_clock::now();
     uint64_t build_ns =

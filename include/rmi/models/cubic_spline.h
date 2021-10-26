@@ -23,7 +23,6 @@ struct    stCubic{
 };
 
 
-
 class   CubicSpline : public  Model{
  public:
   virtual double PredictFloat(uint64_t key) {
@@ -59,7 +58,8 @@ class   CubicSpline : public  Model{
     return  new CubicSpline(cubic.A, cubic.B, cubic.C, cubic.D);
   }
 
-  static  stCubic  Cubic(const std::vector<uint64_t>& keys,
+  template <class KeyType>
+  static  stCubic  Cubic(const std::vector<KeyType>& keys,
                  const std::vector<double >& values){
     uint64_t xmin=keys[0];
     uint64_t ymin=values[0];
