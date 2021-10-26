@@ -37,6 +37,7 @@ class   Builder{
 
   static  RMIModels<KeyType>  *Build(const std::vector<KeyType> &keys, const std::vector<double > &values,
                                    const std::vector<Lookup<KeyType> >  &tests){
+    std::map<std::string, uint64_t >  test_elapse;
     //根据数据选择最适宜的模型进行计算。
     for (int k = 0; k < submodels.size(); ++k) {
       //在这里方便对value进行一次缩放多次使用吧
@@ -52,15 +53,29 @@ class   Builder{
               top_layers[i], leaf_layers[j],submodels[k], keys, values,10);
           assert(model);
           //计算时间
-          TestModel(tests,model);
+          uint64_t  test_tim=TestModel(tests,model);
+          std::ostringstream   test_name;
+          test_name<<top_layers[i]<<"-"<<leaf_layers[j]<<"-"<<submodels[k];
+          test_elapse.insert(std::map<std::string, uint64_t >::value_type(test_name.str(), test_tim));
           delete model;
 //          model->DumpLayerErr();
         }
       }
     }
+    typedef std::pair<std::string, int> MyPairType;
+    struct CompareSecond
+    {
+      bool operator()(const MyPairType& left, const MyPairType& right) const
+      {
+        return left.second < right.second;
+      }
+    };
+
+    std::map<std::string, uint64_t >::iterator ret=std::min_element(  test_elapse.begin(),test_elapse.end(),CompareSecond());
+    std::cout<<"rmi final result:"<<ret->first<<",elapse="<<ret->second<<std::endl;
   }
 
-  static void TestModel(const std::vector< Lookup<KeyType> > &tests , RMISpline<KeyType> *model){
+  static uint64_t TestModel(const std::vector< Lookup<KeyType> > &tests , RMISpline<KeyType> *model){
     auto  begin = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < tests.size(); ++i) {
       rmi::SearchBound bond = model->GetSearchBound(tests[i].key);
@@ -70,7 +85,8 @@ class   Builder{
     uint64_t build_ns =
         std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin)
             .count();
-    std::cout<<"outputresult:"<<model->Name()<<","<<build_ns<<std::endl;
+//    std::cout<<"outputresult:"<<model->Name()<<","<<build_ns<<std::endl;
+    return  build_ns;
   }
 
  private:
