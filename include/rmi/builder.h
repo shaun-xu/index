@@ -4,6 +4,7 @@
 
 #ifndef TS_BUILDER_H
 #define TS_BUILDER_H
+#include <thread>
 
 #include "models/cubic_spline.h"
 #include "models/linear.h"
@@ -35,32 +36,44 @@ class   Builder{
   const static   std::vector<std::string>  leaf_layers;//{"linear", "robust_linear","linear_spline","cubic","loglinear","normal","lognormal" };
   const static   std::vector<uint32_t >   submodels;//{2<<5,2<<6,2<<7,2<<8,2<<9,2<<10,2<<11,2<<12,2<<13,2<<14,2<<15,2<<16,2<<17,2<<18,2<<19,2<<20,2<<21,2<<22,2<<23,2<<24,2<<25};
 
+  static   RMIModels<KeyType>  *Run(int k,const std::vector<KeyType> &keys, const std::vector<double > &values,
+                                 const std::vector<Lookup<KeyType> >  &tests){
+    std::vector<double>     first_layer_data(submodels[k]);
+    uint32_t   permode_count = values.size()/submodels[k];
+    //      double  datasize = (double)first_layer_data.size();
+    for (int i = 0; i < submodels[k]; ++i) {
+      first_layer_data[i] = values[permode_count*i];//(double)values[i]*((double)submodels.size())/(double )datasize;
+    }
+    for (int i = 0; i < top_layers.size(); ++i) {
+      for (int j = 0; j < leaf_layers.size(); ++j) {
+        RMISpline<KeyType>* model = RMISpline<KeyType>::New(
+            top_layers[i], leaf_layers[j],submodels[k], keys, values,10);
+        assert(model);
+        //计算时间
+        uint64_t  test_tim=TestModel(tests,model);
+        std::ostringstream   test_name;
+        test_name<<top_layers[i]<<"-"<<leaf_layers[j]<<"-"<<submodels[k];
+//        test_elapse.insert(std::map<std::string, uint64_t >::value_type(test_name.str(), test_tim));
+        delete model;
+        //          model->DumpLayerErr();
+      }
+    }
+
+  }
+
   static  RMIModels<KeyType>  *Build(const std::vector<KeyType> &keys, const std::vector<double > &values,
                                    const std::vector<Lookup<KeyType> >  &tests){
     std::map<std::string, uint64_t >  test_elapse;
     //根据数据选择最适宜的模型进行计算。
+    std::vector<std::thread *>    threads;
+
     for (int k = 0; k < submodels.size(); ++k) {
       //在这里方便对value进行一次缩放多次使用吧
-      std::vector<double>     first_layer_data(submodels[k]);
-      uint32_t   permode_count = values.size()/submodels[k];
-//      double  datasize = (double)first_layer_data.size();
-      for (int i = 0; i < submodels[k]; ++i) {
-        first_layer_data[i] = values[permode_count*i];//(double)values[i]*((double)submodels.size())/(double )datasize;
-      }
-      for (int i = 0; i < top_layers.size(); ++i) {
-        for (int j = 0; j < leaf_layers.size(); ++j) {
-          RMISpline<KeyType>* model = RMISpline<KeyType>::New(
-              top_layers[i], leaf_layers[j],submodels[k], keys, values,10);
-          assert(model);
-          //计算时间
-          uint64_t  test_tim=TestModel(tests,model);
-          std::ostringstream   test_name;
-          test_name<<top_layers[i]<<"-"<<leaf_layers[j]<<"-"<<submodels[k];
-          test_elapse.insert(std::map<std::string, uint64_t >::value_type(test_name.str(), test_tim));
-          delete model;
-//          model->DumpLayerErr();
-        }
-      }
+      std::thread  * thd  = new std::thread(std::bind(&Run,k));
+      threads.push_back(thd);
+    }
+    for (int i = 0; i < threads.size(); ++i) {
+      threads[i]->join();
     }
     typedef std::pair<std::string, int> MyPairType;
     struct CompareSecond
