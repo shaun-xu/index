@@ -127,7 +127,7 @@ class   Builder{
 };
 
 template <class KeyType>
-const    std::vector<std::string>  Builder<KeyType>::top_layers({"radix", "radix18", "radix22","radix26","radix28" });
+const    std::vector<std::string>  Builder<KeyType>::top_layers({"radix28" });
 
 //const    std::vector<std::string>  Builder<KeyType>::top_layers({"linear", "robust_linear", "linear_spline","cubic","log_linear","normal","log_normal","radix", "radix18", "radix22","radix26","radix28" });
 template <class KeyType>
