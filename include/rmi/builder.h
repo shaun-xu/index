@@ -116,6 +116,10 @@ class   Builder{
       auto  begin = std::chrono::high_resolution_clock::now();
       for (int i = 0; i < tests.size(); ++i) {
         rmi::SearchBound bond = model->GetSearchBound(tests[i].key);
+        for( int j=bond.begin; j< bond.end; j++){
+          if( tests[j].value == j)
+            break;
+        }
         assert(tests[i].value >=bond.begin  && tests[i].value<= bond.end );
       }
       auto  end = std::chrono::high_resolution_clock::now();
@@ -132,7 +136,7 @@ class   Builder{
 };
 
 template <class KeyType>
-const    std::vector<std::string>  Builder<KeyType>::top_layers({"linear", "robust_linear", "linear_spline","cubic","log_linear","normal","log_normal","radix", "radix18", "radix22" });
+const    std::vector<std::string>  Builder<KeyType>::top_layers({"normal","linear", "robust_linear", "linear_spline","cubic","log_linear","log_normal","radix", "radix18", "radix22" });
 template <class KeyType>
 const    std::vector<std::string>  Builder<KeyType>::leaf_layers({"linear", "robust_linear","linear_spline","cubic","log_linear","normal","log_normal" });
 template <class KeyType>
