@@ -89,11 +89,11 @@ class   Builder{
     std::vector<std::thread >    threads;
 
     for (int i = 0; i < leaf_layers.size(); ++i) {
-      threads.push_back(std::thread(RunOneLayer,std::ref(keys),std::ref(values),std::ref(tests)));
+      threads.push_back(std::thread(RunOneLayer,keys,values,tests));
     }
     for (int k = 0; k < submodels.size(); ++k) {
       //在这里方便对value进行一次缩放多次使用吧
-      threads.push_back(std::thread(  Run,k,std::ref(keys),std::ref(values),std::ref(tests)));
+      threads.push_back(std::thread(  Run,k,keys,values,tests));
     }
     for (int i = 0; i < threads.size(); ++i) {
       threads[i].join();
