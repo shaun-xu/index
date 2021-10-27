@@ -18,7 +18,7 @@ class     LogNormal: public Normal{
  public:
 
   virtual double PredictFloat(uint64_t key) {
-    return Phi((double(log(key)) - m_nMean) / m_nStDev) * m_nScale;
+    return cnd_manual((double(log(key)) - m_nMean) / m_nStDev) * m_nScale;
   }
 
   template <class  KeyType>
@@ -26,15 +26,18 @@ class     LogNormal: public Normal{
                              const std::vector<double >& values){
     assert(keys.size() == values.size());
     if(keys.size() == 0){
-      return  new LogNormal(0,0,0);
+      return  new LogNormal(0,0,0,0);
     }
       double   mean=0.0;
       double   stdev=0.0;
       double   scale=0.0;
+      double   min=values[0];
+      double   max =values[values.size()-1];
+      scale = max-min;
 
       for (int i = 0; i < keys.size(); ++i) {
         mean+= (double )log(keys[i])/keys.size();
-        scale = std::max( (double )values[i] ,scale);
+//        scale = std::max( (double )values[i] ,scale);
       }
 
       for (int i = 0; i < keys.size(); ++i) {
@@ -44,10 +47,10 @@ class     LogNormal: public Normal{
       stdev /= keys.size();
       stdev = sqrt(stdev);
 
-      return new  LogNormal(mean,  stdev,  scale);
+      return new  LogNormal(mean,  stdev,  scale, min);
     }
    protected:
-  LogNormal(double  mean, double   dev, double   scale):Normal(mean,dev,scale){
+  LogNormal(double  mean, double   dev, double   scale,double min):Normal(mean,dev,scale,min){
 
   }
 

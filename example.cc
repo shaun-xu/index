@@ -150,16 +150,16 @@ void    TestBuilder(){
     values[i]=i;
   }
 
-  rmi::RMIModels<uint64_t>  *model = rmi::Builder<uint64_t>::Build(keys,values);
-//  for (int i = 0; i < lookups.size(); ++i) {
-    rmi::SearchBound bound = model->GetSearchBound(424242);
-    std::cout << "The search key is in the range: [" << bound.begin << ", "
-              << bound.end << ")" << std::endl;
-    auto start = std::begin(keys) + bound.begin,
-         last = std::begin(keys) + bound.end;
-    auto pos = std::lower_bound(start, last, 424242) - begin(keys);
-    assert(keys[pos] == 424242);
-    std::cout << "The key is at position: " << pos << std::endl;
+//  rmi::RMIModels<uint64_t>  *model = rmi::Builder<uint64_t>::Build(keys,values);
+////  for (int i = 0; i < lookups.size(); ++i) {
+//    rmi::SearchBound bound = model->GetSearchBound(424242);
+//    std::cout << "The search key is in the range: [" << bound.begin << ", "
+//              << bound.end << ")" << std::endl;
+//    auto start = std::begin(keys) + bound.begin,
+//         last = std::begin(keys) + bound.end;
+//    auto pos = std::lower_bound(start, last, 424242) - begin(keys);
+//    assert(keys[pos] == 424242);
+//    std::cout << "The key is at position: " << pos << std::endl;
 
 
 //  }
@@ -167,23 +167,31 @@ void    TestBuilder(){
 
 
 template <class KeyType>
-void    TestBuilder(const string& data_file, const string lookup_file){
+void    TestBuilder(const string& data_file, const string lookup_file,
+                 const std::string &first, const std::string &second, uint32_t submods){
   std::vector<KeyType> keys = load_data<KeyType>(data_file);
   std::vector<double>  values(keys.size());
-  vector<Lookup<KeyType>> lookups =
-      load_data<Lookup<KeyType>>(lookup_file);
+  vector<rmi::Lookup<KeyType>> lookups =load_data<rmi::Lookup<KeyType>>(lookup_file);
   for (int i = 0; i < keys.size(); ++i) {
     values[i]=i;
   }
-  rmi::RMIModels<KeyType>  *model = rmi::Builder<KeyType>::Build(keys,values);
-//  for (int i = 0; i < lookups.size(); ++i) {
-//    rmi::SearchBound bound = model->GetSearchBound(lookups[i].key);
-//    if(bound.begin> lookups[i].value ||
-//        bound.end  < lookups[i].value) {
-//      std::cout<<"error"<<std::endl;
-//    }
-//
-//  }
+  std::vector<double>     first_layer_data(values);
+  double  datasize = (double)first_layer_data.size();
+  for (int i = 0; i < datasize; ++i) {
+    first_layer_data[i] = (double)values[i]*(submods)/(double )datasize;
+  }
+
+  rmi::RMIModels<KeyType>  *model = rmi::RMIModels<KeyType >::New(first,second,keys,values,submods,first_layer_data);
+
+//  rmi::RMIModels<KeyType>  *model = rmi::Builder<KeyType>::Build(keys,values);
+  for (int i = 0; i < lookups.size(); ++i) {
+    rmi::SearchBound bound = model->GetSearchBound(lookups[i].key);
+    if(bound.begin> lookups[i].value ||
+        bound.end  < lookups[i].value) {
+      std::cout<<"error"<<std::endl;
+    }
+  }
+
 }
 
 void  TestRMISpline(){
@@ -196,7 +204,7 @@ void  TestRMISpline(){
     values[i]=i;
   }
 
-  rmi::Builder<uint64_t >::Build(keys,values);
+//  rmi::Builder<uint64_t >::Build(keys,values);
 //  rmi::RMISpline<uint64_t >  *model = rmi::RMISpline<uint64_t >::New("linear","normal", 64,keys,values,10);
 ////  model->GetSearchBound(1000);
 //  for (int i = 0; i < keys.size(); ++i) {
@@ -214,7 +222,21 @@ int main(int argc, char** argv) {
   //  rmi::BalancedRadix::Test();
 //  TestRadixSpline();
 //  TestRMISpline();
+  if (argc != 6) {
+    std::cout << "usage: " << argv[0] << " <data_file> <lookup_file> <first_layer> <second_layer> <submods>" << endl;
+    exit(-1);
+  }
 
+  const string data_file = argv[1];
+  const string lookup_file = argv[2];
+  const std::string   first_layer = argv[3];
+  const std::string     second_layer = argv[4];
+  uint32_t  submods =  atoi(argv[5]);
+  if (data_file.find("32") != string::npos) {
+    TestBuilder<uint32_t >(data_file,lookup_file,  first_layer, second_layer,  submods);
+  } else {
+    TestBuilder<uint64_t >(data_file,lookup_file,  first_layer, second_layer,  submods);
+  }
 
 //  TestBuilder();
 
