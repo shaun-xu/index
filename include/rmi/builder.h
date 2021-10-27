@@ -117,7 +117,7 @@ class   Builder{
       for (int i = 0; i < tests.size(); ++i) {
         rmi::SearchBound bond = model->GetSearchBound(tests[i].key);
         for( int j=bond.begin; j< bond.end; j++){
-          if( tests[j].value == j)
+          if( tests[j].key == tests[i].key)
             break;
         }
         assert(tests[i].value >=bond.begin  && tests[i].value<= bond.end );
