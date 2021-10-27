@@ -28,6 +28,7 @@ struct Lookup {
   uint64_t value;
 };
 
+static   std::map<std::string,uint64_t >    test_elapse;
 
 template <class KeyType>
 class   Builder{
@@ -53,13 +54,33 @@ class   Builder{
         uint64_t  test_tim=TestModel(tests,model);
         std::ostringstream   test_name;
         test_name<<top_layers[i]<<"-"<<leaf_layers[j]<<"-"<<submodels[k];
-//        test_elapse.insert(std::map<std::string, uint64_t >::value_type(test_name.str(), test_tim));
+        test_elapse.insert(std::map<std::string, uint64_t >::value_type(test_name.str(), test_tim));
         delete model;
+        std::cout<<"run result:"<< test_name.str()<<","<<test_tim <<std::endl;
         //          model->DumpLayerErr();
       }
     }
 
   }
+
+  static   void  RunOneLayer(const std::vector<KeyType> &keys, const std::vector<double > &values,
+                  const std::vector<Lookup<KeyType> >  &tests){
+      for (int j = 0; j < leaf_layers.size(); ++j) {
+        RMISpline<KeyType>* model = RMISpline<KeyType>::New(
+            leaf_layers[j], "",0, keys, values,10);
+        assert(model);
+        //计算时间
+        uint64_t  test_tim=TestModel(tests,model);
+        std::ostringstream   test_name;
+        test_name<<leaf_layers[j];
+        test_elapse.insert(std::map<std::string, uint64_t >::value_type(test_name.str(), test_tim));
+        delete model;
+        std::cout<<"run result:"<< test_name.str()<<","<<test_tim <<std::endl;
+        //          model->DumpLayerErr();
+      }
+
+  }
+
 
   static  RMIModels<KeyType>  *Build(const std::vector<KeyType> &keys, const std::vector<double > &values,
                                    const std::vector<Lookup<KeyType> >  &tests){
@@ -67,9 +88,11 @@ class   Builder{
     //根据数据选择最适宜的模型进行计算。
     std::vector<std::thread >    threads;
 
+    for (int i = 0; i < leaf_layers.size(); ++i) {
+      threads.push_back(std::thread(RunOneLayer,std::ref(keys),std::ref(values),std::ref(tests)));
+    }
     for (int k = 0; k < submodels.size(); ++k) {
       //在这里方便对value进行一次缩放多次使用吧
-
       threads.push_back(std::thread(  Run,k,std::ref(keys),std::ref(values),std::ref(tests)));
     }
     for (int i = 0; i < threads.size(); ++i) {
@@ -111,7 +134,8 @@ template <class KeyType>
 const    std::vector<std::string>  Builder<KeyType>::leaf_layers({"linear", "robust_linear","linear_spline","cubic","log_linear","normal","log_normal" });
 template <class KeyType>
 const    std::vector<uint32_t >   Builder<KeyType>::submodels({2<<5,2<<6,2<<7,2<<8,2<<9,2<<10});
-
+//template <class KeyType>
+//std::map<std::string,uint64_t >    Builder<KeyType>::test_elapse;
 //const    std::vector<uint32_t >   Builder<KeyType>::submodels({2<<5,2<<6,2<<7,2<<8,2<<9,2<<10,2<<11,2<<12,2<<13,2<<14,2<<15,2<<16,2<<17,2<<18,2<<19,2<<20,2<<21,2<<22,2<<23,2<<24,2<<25});
 
 
