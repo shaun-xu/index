@@ -63,9 +63,9 @@ class   Builder{
 
   }
 
-  static   void  RunOneLayer(const std::vector<KeyType> &keys, const std::vector<double > &values,
+  static   void  RunOneLayer(int j,const std::vector<KeyType> &keys, const std::vector<double > &values,
                   const std::vector<Lookup<KeyType> >  &tests){
-      for (int j = 0; j < leaf_layers.size(); ++j) {
+
         RMISpline<KeyType>* model = RMISpline<KeyType>::New(
             leaf_layers[j], "",0, keys, values,10);
         assert(model);
@@ -77,8 +77,6 @@ class   Builder{
         delete model;
         std::cout<<"run result:"<< test_name.str()<<","<<test_tim <<std::endl;
         //          model->DumpLayerErr();
-      }
-
   }
 
 
@@ -89,7 +87,7 @@ class   Builder{
     std::vector<std::thread >    threads;
 
     for (int i = 0; i < leaf_layers.size(); ++i) {
-      threads.push_back(std::thread(RunOneLayer,keys,values,tests));
+      threads.push_back(std::thread(RunOneLayer,i, keys,values,tests));
     }
     for (int k = 0; k < submodels.size(); ++k) {
       //在这里方便对value进行一次缩放多次使用吧
