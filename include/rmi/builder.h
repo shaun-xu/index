@@ -56,7 +56,7 @@ class   Builder{
         test_name<<top_layers[i]<<"-"<<leaf_layers[j]<<"-"<<submodels[k];
         test_elapse.insert(std::map<std::string, uint64_t >::value_type(test_name.str(), test_tim));
         delete model;
-        std::cout<<"run result:"<< test_name.str()<<","<<test_tim <<std::endl;
+        std::cout<<"run result:"<< test_name.str()<<","<<test_tim/tests.size() <<std::endl;
         //          model->DumpLayerErr();
       }
     }
@@ -75,7 +75,7 @@ class   Builder{
         test_name<<leaf_layers[j];
         test_elapse.insert(std::map<std::string, uint64_t >::value_type(test_name.str(), test_tim));
         delete model;
-        std::cout<<"run result:"<< test_name.str()<<","<<test_tim <<std::endl;
+        std::cout<<"run result:"<< test_name.str()<<","<<test_tim/tests.size() <<std::endl;
         //          model->DumpLayerErr();
   }
 
@@ -110,17 +110,22 @@ class   Builder{
   }
 
   static uint64_t TestModel(const std::vector< Lookup<KeyType> > &tests , RMISpline<KeyType> *model){
-    auto  begin = std::chrono::high_resolution_clock::now();
-    for (int i = 0; i < tests.size(); ++i) {
-      rmi::SearchBound bond = model->GetSearchBound(tests[i].key);
-      assert(tests[i].value >=bond.begin  && tests[i].value<= bond.end );
+    uint64_t  total=0;
+    for (int i = 0; i < 3; ++i) {
+      //计算3次，求取平均值
+      auto  begin = std::chrono::high_resolution_clock::now();
+      for (int i = 0; i < tests.size(); ++i) {
+        rmi::SearchBound bond = model->GetSearchBound(tests[i].key);
+        assert(tests[i].value >=bond.begin  && tests[i].value<= bond.end );
+      }
+      auto  end = std::chrono::high_resolution_clock::now();
+      uint64_t build_ns =
+          std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin)
+              .count();
+      total+= build_ns;
     }
-    auto  end = std::chrono::high_resolution_clock::now();
-    uint64_t build_ns =
-        std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin)
-            .count();
 //    std::cout<<"outputresult:"<<model->Name()<<","<<build_ns<<std::endl;
-    return  build_ns;
+    return  total/3;
   }
 
  private:
