@@ -21,6 +21,8 @@ class     LogNormal: public Normal{
     return cnd_manual((double(log(key)) - m_nMean) / m_nStDev) * m_nScale;
   }
 
+  std::string  Name(){  return "log_normal";}
+
   template <class  KeyType>
   static   LogNormal * New(const std::vector<KeyType>& keys,
                              const std::vector<double >& values){
