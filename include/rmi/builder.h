@@ -127,13 +127,11 @@ class   Builder{
 };
 
 template <class KeyType>
-const    std::vector<std::string>  Builder<KeyType>::top_layers({"radix28" });
-
-//const    std::vector<std::string>  Builder<KeyType>::top_layers({"linear", "robust_linear", "linear_spline","cubic","log_linear","normal","log_normal","radix", "radix18", "radix22","radix26","radix28" });
+const    std::vector<std::string>  Builder<KeyType>::top_layers({"linear", "robust_linear", "linear_spline","cubic","log_linear","normal","log_normal","radix", "radix18", "radix22" });
 template <class KeyType>
 const    std::vector<std::string>  Builder<KeyType>::leaf_layers({"linear", "robust_linear","linear_spline","cubic","log_linear","normal","log_normal" });
 template <class KeyType>
-const    std::vector<uint32_t >   Builder<KeyType>::submodels({2<<5,2<<6,2<<7,2<<8,2<<9,2<<10});
+const    std::vector<uint32_t >   Builder<KeyType>::submodels({2<<5,2<<6,2<<7,2<<8,2<<9,2<<10,2<<11,2<<12,2<<13,2<<14,2<<15,2<<16});
 //template <class KeyType>
 //std::map<std::string,uint64_t >    Builder<KeyType>::test_elapse;
 //const    std::vector<uint32_t >   Builder<KeyType>::submodels({2<<5,2<<6,2<<7,2<<8,2<<9,2<<10,2<<11,2<<12,2<<13,2<<14,2<<15,2<<16,2<<17,2<<18,2<<19,2<<20,2<<21,2<<22,2<<23,2<<24,2<<25});
