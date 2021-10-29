@@ -57,6 +57,10 @@ class   RadixTable: public Model{
 
   std::string   Name(){return "radix_table";}
 
+  virtual  uint32_t   Size(){
+    return   sizeof(m_nPrefix)+sizeof(m_nBits)+sizeof(uint32_t)*m_vTables.size() ;
+  }
+
  private:
   RadixTable(uint32_t  prefix, uint32_t  bits , const std::vector<uint32_t> &tables){
     m_nPrefix = prefix;

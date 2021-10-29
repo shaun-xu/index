@@ -27,6 +27,9 @@ class   Normal : public  Model{
   }
 
   std::string  Name(){  return "normal";}
+  virtual  uint32_t   Size(){
+    return   sizeof(m_nStart)+sizeof(m_nMean)+sizeof(m_nStDev)+sizeof(m_nScale) ;
+  }
 
   template <class  KeyType>
   static   Normal *  New(const std::vector<KeyType>& keys,

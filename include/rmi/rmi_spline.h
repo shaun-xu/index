@@ -24,6 +24,18 @@ template <class KeyType>
 class   RMISpline  {
  public:
 
+  virtual  uint32_t   Size() {
+    uint32_t  size=0;
+    if(m_pFirstLayer){
+      size+= m_pFirstLayer->Size();
+    }
+    if(m_pSecond){
+      size+= m_pSecond->Size();
+    }
+    return size;
+  }
+
+
   // Returns a search bound [begin, end) around the estimated position.
   SearchBound GetSearchBound(const KeyType key)  {
     uint32_t  splint_index = GetSplinePoint(key);

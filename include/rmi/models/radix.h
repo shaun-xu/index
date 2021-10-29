@@ -27,6 +27,9 @@ class   Radix : public Model{
   }
 
   std::string   Name(){return "radix";}
+  virtual  uint32_t   Size(){
+    return   sizeof(m_nCommonPrefix)+sizeof(m_nBits);//+sizeof(m_nStDev)+sizeof(m_nScale) ;
+  }
 
  private:
   Radix(size_t  common_prefix, size_t  bits){

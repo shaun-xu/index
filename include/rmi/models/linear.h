@@ -33,6 +33,9 @@ class LinearModel : public Model{
   std::string Name() { return "linear"; }
   double m_a;
   double m_b;
+  virtual  uint32_t   Size(){
+    return   sizeof(m_a)+sizeof(m_b);//+sizeof(m_nC)+sizeof(m_nD) ;
+  }
 
 
  private:

@@ -34,6 +34,11 @@ class   LinearSpline : public Model{
 
     return new LinearSpline(intercept, slope);
   }
+
+  virtual  uint32_t   Size(){
+    return   sizeof(m_fIntercept)+sizeof(m_fSlope);//+sizeof(m_nC)+sizeof(m_nD) ;
+  }
+
  private:
   LinearSpline(double  intercept, double  slope){
     m_fIntercept = intercept;

@@ -23,6 +23,7 @@ class     LogNormal: public Normal{
 
   std::string  Name(){  return "log_normal";}
 
+
   template <class  KeyType>
   static   LogNormal * New(const std::vector<KeyType>& keys,
                              const std::vector<double >& values){

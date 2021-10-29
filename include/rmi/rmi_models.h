@@ -32,6 +32,19 @@ struct   KeyPos{
 template <class KeyType>
 class RMIModels {
  public:
+
+  virtual  uint32_t   Size() {
+    uint32_t  size=0;
+    if(m_pFirstLayer){
+      size += m_pFirstLayer->Size();
+    }
+    for (int i = 0; i < m_vSecondLayer.size(); ++i) {
+      size+=  m_vSecondLayer[i]->Size();
+    }
+    size +=  m_vError.size() * sizeof(uint32_t);
+    return size;
+  }
+
   // Returns the estimated position of `key`.
   double GetEstimatedPosition(const KeyType key) const {
   }

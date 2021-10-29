@@ -115,6 +115,10 @@ class   CubicSpline : public  Model{
   }
 
   std::string Name() { return "cubic_spline"; }
+  virtual  uint32_t   Size(){
+    return   sizeof(m_nA)+sizeof(m_nB)+sizeof(m_nC)+sizeof(m_nD) ;
+  }
+
 
  private:
   CubicSpline(double a, double  b, double  c ,double  d){

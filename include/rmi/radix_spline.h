@@ -26,8 +26,12 @@ struct Coord {
 };
 
 template <class KeyType>
-class RadixSpline {
+class RadixSpline  {
  public:
+  virtual  uint32_t   Size() {
+    return sizeof(*this)+spline_points_.size() * sizeof(Coord<KeyType>);
+  }
+
   RadixSpline(const std::vector<KeyType>& keys,
               const std::vector<double>& values, size_t max_error)
       : spline_max_error_(max_error) {
@@ -251,6 +255,8 @@ class RadixSpline {
 
     RememberPreviousCDFPoint(key, position);
   }
+
+
  private:
   KeyType min_key_;
   KeyType max_key_;

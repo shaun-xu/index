@@ -26,6 +26,10 @@ class   BalancedRadix : public Model{
     return   input-m_nMax;
   }
 
+  virtual  uint32_t   Size(){
+    return   sizeof(m_nPrefix)+sizeof(m_nBits)+sizeof(m_nMax) ;
+  }
+
   static  bool  Test(){
     std::vector<uint64_t>   keys(65000);
     std::vector<double>   values(65000);
@@ -99,9 +103,11 @@ class   BalancedRadix : public Model{
   std::string  Name(){ return "bradix";}
 
  private:
+
   BalancedRadix(){
 
   }
+
   BalancedRadix(uint32_t prefix, uint32_t  bits,  uint64_t  max,bool high){
     m_nPrefix = prefix;
     m_nBits = bits;

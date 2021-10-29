@@ -32,6 +32,9 @@ class   RobustLinear:public  Model{
   }
 
   std::string Name() { return "robust_linear"; }
+  virtual  uint32_t   Size(){
+    return   sizeof(m_nA)+sizeof(m_nB);//+sizeof(uint32_t)*m_vTables.size() ;
+  }
 
  private:
   RobustLinear(double a, double  b){

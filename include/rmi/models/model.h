@@ -31,6 +31,8 @@ class Model {
 
   virtual  std::string   Name()=0;
 
+  virtual  uint32_t   Size() = 0;
+
   bool NeedsBoundCheck() { return true; }
 
   ModelRestriction Restriction() { return ModelRestriction::None; }
