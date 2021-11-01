@@ -37,6 +37,18 @@ class   Builder{
   const static   std::vector<std::string>  leaf_layers;//{"linear", "robust_linear","linear_spline","cubic","loglinear","normal","lognormal" };
   const static   std::vector<uint32_t >   submodels;//{2<<5,2<<6,2<<7,2<<8,2<<9,2<<10,2<<11,2<<12,2<<13,2<<14,2<<15,2<<16,2<<17,2<<18,2<<19,2<<20,2<<21,2<<22,2<<23,2<<24,2<<25};
 
+  static    void  AutoTune(int k,const std::vector<KeyType> &keys, const std::vector<double > &values,
+                       const std::vector<Lookup<KeyType> >  &tests){
+      //计算一下 二分法查找  和 直接顺序查找的平衡点。
+
+      //计算 linear  模型 cubic,  normal  log等几个模型的平均计算性能。  a1  a2  a3  a4
+
+      //计算各个模型的方差    d1  d2  d3  d4
+
+      //评估
+
+  }
+
   static   void  Run(int k,const std::vector<KeyType> &keys, const std::vector<double > &values,
                                  const std::vector<Lookup<KeyType> >  &tests){
     std::vector<double>     first_layer_data(submodels[k]);
