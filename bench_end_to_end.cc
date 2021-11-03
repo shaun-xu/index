@@ -357,6 +357,22 @@ void RunRMI(const string& data_file, const string lookup_file) {
 
 
 template <class KeyType>
+void RunRMIOnly(const string& data_file, const string lookup_file) {
+  // Load data
+  std::cerr << "Load data.." << std::endl;
+  vector<KeyType> keys = util::load_data<KeyType>(data_file);
+
+  std::vector<double>  values(keys.size());
+  vector<rmi::Lookup<KeyType>> lookups =
+      util::load_data<rmi::Lookup<KeyType>>(lookup_file);
+  for (int i = 0; i < keys.size(); ++i) {
+    values[i]=i;
+  }
+  rmi::Builder<KeyType>::RunRmiOnly(keys,values,lookups);
+}
+
+
+template <class KeyType>
 void RunRS(const string& data_file, const string lookup_file) {
   // Load data
   vector<KeyType> keys = util::load_data<KeyType>(data_file);
@@ -505,6 +521,8 @@ int main(int argc, char** argv) {
       RunTS<uint32_t>(data_file, lookup_file);
     else if(index_type == "rmi")
       RunRMI<uint32_t >(data_file, lookup_file);
+    else if(index_type == "only")
+      RunRMIOnly<uint32_t >(data_file, lookup_file);
     else
       CustomRunTS<uint32_t>(data_file, lookup_file, max_error);
   } else {
@@ -514,6 +532,8 @@ int main(int argc, char** argv) {
       RunTS<uint64_t>(data_file, lookup_file);
     else if(index_type == "rmi")
       RunRMI<uint64_t >(data_file, lookup_file);
+    else if(index_type == "only")
+      RunRMIOnly<uint64_t >(data_file, lookup_file);
     else
       CustomRunTS<uint64_t>(data_file, lookup_file, max_error);
   }

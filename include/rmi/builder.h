@@ -49,6 +49,39 @@ class   Builder{
 
   }
 
+  static   void RunRmiThread(int k,const std::vector<KeyType> &keys, const std::vector<double > &values,
+                           const std::vector<Lookup<KeyType> >  &tests){
+    std::vector<double>     first_layer_data(submodels[k]);
+    uint32_t   permode_count = values.size()/submodels[k];
+    double  datasize = (double)first_layer_data.size();
+    for (int i = 0; i < submodels[k]; ++i) {
+      first_layer_data[i] = values[permode_count*i];//(double)values[i]*((double)submodels.size())/(double )datasize;
+    }
+    for(int  i=0; i< top_layers.size(); i++){
+      for (int j=0; j< leaf_layers.size(); j++){
+        RMIModels<KeyType>  *model = RMIModels<KeyType>::New(top_layers[i],leaf_layers[j],keys,values,submodels[k],first_layer_data);
+        uint64_t  test_tim=TestModel<   RMIModels<KeyType> >(tests,model);
+        delete model;
+        std::cout<<"run result:"<< "rmi_"<<top_layers[i]<<"_"<<leaf_layers[j]<<"_"<<submodels[k]<<","<<test_tim/tests.size() <<std::endl;
+      }
+    }
+
+  }
+
+  static  void  RunRmiOnly(const std::vector<KeyType> &keys, const std::vector<double > &values,
+                         const std::vector<Lookup<KeyType> >  &tests ){
+    std::vector<std::thread >    threads;
+      for(int k=0; k<submodels.size(); k++){
+//        auto task=std::thread(RunOneLayer,k, keys,values,tests);
+        threads.emplace_back(std::thread(RunOneLayer,k, keys,values,tests));
+      }
+      for (int i = 0; i < threads.size(); ++i) {
+        threads[i].join();
+      }
+
+  }
+
+
   static   void  Run(int k,const std::vector<KeyType> &keys, const std::vector<double > &values,
                                  const std::vector<Lookup<KeyType> >  &tests){
     std::vector<double>     first_layer_data(submodels[k]);
@@ -105,6 +138,8 @@ class   Builder{
       //在这里方便对value进行一次缩放多次使用吧
       threads.push_back(std::thread(  Run,k,keys,values,tests));
     }
+//    threads.push_back(std::thread(RunRmiOnly,keys,values,tests));
+
     for (int i = 0; i < threads.size(); ++i) {
       threads[i].join();
     }
@@ -121,7 +156,8 @@ class   Builder{
     std::cout<<"rmi final result:"<<ret->first<<",elapse="<<ret->second<<std::endl;
   }
 
-  static uint64_t TestModel(const std::vector< Lookup<KeyType> > &tests , RMISpline<KeyType> *model){
+  template <class MODE_TYPE>
+  static uint64_t TestModel(const std::vector< Lookup<KeyType> > &tests , MODE_TYPE *model){
     uint64_t  total=0;
     for (int i = 0; i < 3; ++i) {
       //计算3次，求取平均值
