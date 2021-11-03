@@ -73,7 +73,7 @@ class   Builder{
     std::vector<std::thread >    threads;
       for(int k=0; k<submodels.size(); k++){
 //        auto task=std::thread(RunOneLayer,k, keys,values,tests);
-        threads.emplace_back(std::thread(RunOneLayer,k, keys,values,tests));
+        threads.emplace_back(std::thread(RunRmiThread,k, keys,values,tests));
       }
       for (int i = 0; i < threads.size(); ++i) {
         threads[i].join();
